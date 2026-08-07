@@ -1,0 +1,77 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --background: #f7f8f9;
+  --foreground: #111827;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Azentra brand */
+  --color-brand: #4ea372;
+  --color-brand-dark: #438c61;
+  --color-link: #1b4f8f;
+  --color-link-dark: #143c6e;
+
+  /* Neutrals used by the auth screens */
+  --color-ink: #1f2937;
+  --color-muted: #6b7280;
+  --color-hairline: #e5e7eb;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Chart entrance animations — lines draw in, areas fade, bars grow. */
+@keyframes chart-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes chart-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes chart-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.chart-line {
+  stroke-dasharray: 1;
+  animation: chart-draw 900ms ease-out both;
+}
+.chart-area {
+  animation: chart-fade 700ms 300ms ease-out both;
+}
+.chart-bar {
+  animation: chart-grow 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-line,
+  .chart-area,
+  .chart-bar {
+    animation: none;
+    stroke-dasharray: none;
+  }
+}
