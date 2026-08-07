@@ -13,6 +13,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { PageHeader } from "@/components/ui/page-header";
 import { SearchInput } from "@/components/ui/search-input";
 import { SelectFilter } from "@/components/ui/select-filter";
+import { recordAudit } from "@/lib/audit-store";
 import {
   FACILITY_CATEGORIES,
   type Facility,
@@ -67,6 +68,20 @@ export function CommonAreasView({
     const capacity = Number(values.capacity);
     const name = values.name.trim();
 
+    recordAudit(
+      form?.mode === "edit"
+        ? {
+            action: "Facility Updated",
+            module: "Facilities",
+            details: `${name} updated — ${values.category}, ${values.location.trim()}, capacity ${capacity}`,
+          }
+        : {
+            action: "Facility Created",
+            module: "Facilities",
+            details: `${name} added as a ${values.category} facility at ${values.location.trim()} (capacity ${capacity})`,
+          },
+    );
+
     setList((current) => {
       if (form?.mode === "edit") {
         return current.map((facility) =>
@@ -109,6 +124,11 @@ export function CommonAreasView({
 
   function confirmDelete() {
     if (!pendingDelete) return;
+    recordAudit({
+      action: "Facility Deleted",
+      module: "Facilities",
+      details: `${pendingDelete.name} (${pendingDelete.category}, ${pendingDelete.location}) removed`,
+    });
     setList((current) =>
       current.filter((facility) => facility.id !== pendingDelete.id),
     );

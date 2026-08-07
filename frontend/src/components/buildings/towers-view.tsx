@@ -11,6 +11,7 @@ import {
 import { AddButton } from "@/components/ui/add-button";
 import { PageHeader } from "@/components/ui/page-header";
 import { SearchInput } from "@/components/ui/search-input";
+import { recordAudit } from "@/lib/audit-store";
 import type { Tower, TowerTheme } from "@/lib/buildings-data";
 
 const THEME_CYCLE: TowerTheme[] = ["orange", "teal", "crimson", "purple"];
@@ -56,6 +57,20 @@ export function TowersView({ towers }: { towers: Tower[] }) {
     const floors = Number(values.floors);
     const totalUnits = floors * Number(values.unitsPerFloor);
     const name = values.name.trim();
+
+    recordAudit(
+      form?.mode === "edit"
+        ? {
+            action: "Tower Updated",
+            module: "Units",
+            details: `${name} updated — ${floors} floors, ${totalUnits} units, status ${values.status}`,
+          }
+        : {
+            action: "Tower Created",
+            module: "Units",
+            details: `${name} created with ${floors} floors and ${totalUnits} units`,
+          },
+    );
 
     setTowerList((list) => {
       if (form?.mode === "edit") {

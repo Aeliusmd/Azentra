@@ -18,6 +18,7 @@ import { OccupancyTrendChart } from "@/components/reports/occupancy-trend-chart"
 import { RevenueChart } from "@/components/reports/revenue-chart";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
+import { recordAudit } from "@/lib/audit-store";
 import { property } from "@/lib/dashboard-data";
 import {
   DATE_RANGES,
@@ -99,6 +100,12 @@ function downloadCsv() {
   link.download = "occupancy-report.csv";
   link.click();
   URL.revokeObjectURL(url);
+
+  recordAudit({
+    action: "Report Exported",
+    module: "Reports",
+    details: `Occupancy report exported as CSV — ${occupancyByTower.length} towers`,
+  });
 }
 
 export function ReportsView() {

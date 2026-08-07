@@ -14,6 +14,7 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { IconButton } from "@/components/ui/icon-button";
 import { PageHeader } from "@/components/ui/page-header";
 import { SearchInput } from "@/components/ui/search-input";
+import { recordAudit } from "@/lib/audit-store";
 import type { Role } from "@/lib/roles-data";
 
 const HEADINGS = [
@@ -61,6 +62,20 @@ export function RolesView({ roles }: { roles: Role[] }) {
   function handleSubmit(values: RoleFormValues) {
     const name = values.name.trim();
 
+    recordAudit(
+      form?.mode === "edit"
+        ? {
+            action: "Role Updated",
+            module: "Roles",
+            details: `${name} updated — now holds ${values.permissions.length} permissions`,
+          }
+        : {
+            action: "Role Created",
+            module: "Roles",
+            details: `${name} created with ${values.permissions.length} permissions`,
+          },
+    );
+
     setList((current) => {
       if (form?.mode === "edit") {
         return current.map((role) =>
@@ -91,6 +106,11 @@ export function RolesView({ roles }: { roles: Role[] }) {
 
   function confirmDelete() {
     if (!pendingDelete) return;
+    recordAudit({
+      action: "Role Deleted",
+      module: "Roles",
+      details: `${pendingDelete.name} removed — was assigned to ${pendingDelete.users} user${pendingDelete.users === 1 ? "" : "s"}`,
+    });
     setList((current) => current.filter((role) => role.id !== pendingDelete.id));
     setPendingDelete(null);
   }

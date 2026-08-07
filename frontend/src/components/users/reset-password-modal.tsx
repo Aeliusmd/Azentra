@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, Copy, TriangleAlert } from "lucide-react";
 
 import { Modal } from "@/components/ui/modal";
+import { recordAudit } from "@/lib/audit-store";
 import type { User } from "@/lib/users-data";
 
 const ALPHABET =
@@ -83,7 +84,15 @@ export function ResetPasswordModal({
             </button>
             <button
               type="button"
-              onClick={() => setGenerated(generatePassword())}
+              onClick={() => {
+                setGenerated(generatePassword());
+                // The password itself is never logged.
+                recordAudit({
+                  action: "Password Reset",
+                  module: "Security",
+                  details: `Temporary password issued for ${user.name} (${user.email})`,
+                });
+              }}
               className="rounded-md bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-amber-600 focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 focus-visible:outline-none"
             >
               Reset Password

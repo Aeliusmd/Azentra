@@ -17,6 +17,7 @@ import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { SearchInput } from "@/components/ui/search-input";
 import { SelectFilter } from "@/components/ui/select-filter";
+import { recordAudit } from "@/lib/audit-store";
 import {
   USER_ROLES,
   USER_STATUSES,
@@ -102,6 +103,21 @@ export function UsersView({ users }: { users: User[] }) {
 
   function handleSubmit(values: UserFormValues) {
     const name = values.name.trim();
+    const where = values.unit ? `${values.unit}, ${values.tower}` : values.tower;
+
+    recordAudit(
+      form?.mode === "edit"
+        ? {
+            action: "User Updated",
+            module: "Users",
+            details: `${name} (${values.email.trim()}) updated — ${values.role} at ${where}`,
+          }
+        : {
+            action: "User Created",
+            module: "Users",
+            details: `${name} (${values.email.trim()}) added as ${values.role} at ${where}`,
+          },
+    );
 
     setList((current) => {
       if (form?.mode === "edit") {
@@ -139,6 +155,12 @@ export function UsersView({ users }: { users: User[] }) {
   }
 
   function toggleDisabled(target: User) {
+    const enabling = target.status === "disabled";
+    recordAudit({
+      action: enabling ? "User Enabled" : "User Disabled",
+      module: "Users",
+      details: `${target.name} (${target.email}) ${enabling ? "re-enabled" : "disabled"} — ${target.role}`,
+    });
     setList((current) =>
       current.map((user) =>
         user.id === target.id

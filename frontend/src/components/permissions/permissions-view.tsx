@@ -11,6 +11,7 @@ import { IconButton } from "@/components/ui/icon-button";
 import { PageHeader } from "@/components/ui/page-header";
 import { SearchInput } from "@/components/ui/search-input";
 import { SelectFilter } from "@/components/ui/select-filter";
+import { recordAudit } from "@/lib/audit-store";
 import {
   MODULE_LABELS,
   rolesWithPermission,
@@ -46,6 +47,11 @@ export function PermissionsView({
   }, [module, permissions, query]);
 
   function handleSave(role: string, permissionIds: string[]) {
+    recordAudit({
+      action: "Permissions Assigned",
+      module: "Permissions",
+      details: `${role} now holds ${permissionIds.length} of ${permissions.length} permissions`,
+    });
     setAssignments((current) => ({ ...current, [role]: permissionIds }));
     setAssignOpen(false);
   }

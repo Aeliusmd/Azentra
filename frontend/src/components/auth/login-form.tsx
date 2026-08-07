@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { InputField } from "@/components/ui/input-field";
 import { PasswordField } from "@/components/ui/password-field";
 import { ApiError, login } from "@/lib/api";
+import { recordAudit } from "@/lib/audit-store";
 import { validateLogin, type Errors, type LoginValues } from "@/lib/validation";
 
 const INITIAL: LoginValues = { email: "", password: "" };
@@ -44,8 +45,21 @@ export function LoginForm() {
         password: values.password,
         rememberMe,
       });
+      recordAudit({
+        action: "User Login",
+        module: "Security",
+        performedBy: values.email.trim(),
+        details: `Successful sign in from the admin portal${rememberMe ? " (remembered device)" : ""}`,
+      });
       router.push("/admin/dashboard");
     } catch (error) {
+      // Failed sign-ins are exactly what an audit trail is for.
+      recordAudit({
+        action: "Login Failed",
+        module: "Security",
+        performedBy: values.email.trim(),
+        details: `Sign in attempt rejected for ${values.email.trim()}`,
+      });
       setFormError(
         error instanceof ApiError
           ? error.message
