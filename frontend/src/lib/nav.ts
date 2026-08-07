@@ -32,6 +32,7 @@ export const navItems: NavItem[] = [
 /** Routes that have a breadcrumb but no sidebar entry. */
 const EXTRA_LABELS: Record<string, string> = {
   "/admin/profile": "My Profile",
+  "/admin/notifications": "Notifications",
 };
 
 /** Label shown as the trailing breadcrumb crumb for a given path. */

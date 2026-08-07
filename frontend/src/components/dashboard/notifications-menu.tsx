@@ -2,27 +2,29 @@
 
 import { useCallback, useState } from "react";
 import Link from "next/link";
-import { Bell } from "lucide-react";
+import { Bell, Check } from "lucide-react";
 
 import { useDismiss } from "@/hooks/use-dismiss";
+import { TONE_DOT } from "@/lib/notifications-data";
 import {
-  TONE_DOT,
-  notifications as seed,
-  type Notification,
-} from "@/lib/notifications-data";
+  markAllRead,
+  markRead,
+  unreadCount,
+  useNotifications,
+} from "@/lib/notifications-store";
+
+/** The dropdown is a preview — the full list lives on /admin/notifications. */
+const PREVIEW_COUNT = 5;
 
 export function NotificationsMenu() {
-  const [items, setItems] = useState<Notification[]>(seed);
+  const items = useNotifications();
   const [open, setOpen] = useState(false);
 
   const close = useCallback(() => setOpen(false), []);
   const ref = useDismiss<HTMLDivElement>(open, close);
 
-  const unread = items.filter((item) => !item.read).length;
-
-  function markAllRead() {
-    setItems((current) => current.map((item) => ({ ...item, read: true })));
-  }
+  const unread = unreadCount(items);
+  const preview = items.slice(0, PREVIEW_COUNT);
 
   return (
     <div ref={ref} className="relative">
@@ -67,34 +69,48 @@ export function NotificationsMenu() {
               You’re all caught up.
             </p>
           ) : (
-            <ul className="max-h-[320px] overflow-y-auto">
-              {items.map((item) => (
-                <li key={item.id} className="px-4 py-3">
-                  <div className="flex gap-2.5">
+            <ul className="max-h-[340px] overflow-y-auto">
+              {preview.map((item) => (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => markRead(item.id)}
+                    className={`flex w-full gap-2.5 px-4 py-3 text-left transition-colors hover:bg-gray-50 ${
+                      item.read ? "" : "bg-blue-50/40"
+                    }`}
+                  >
                     <span
                       aria-hidden="true"
                       className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${
                         item.read ? "bg-gray-300" : TONE_DOT[item.tone]
                       }`}
                     />
-                    <div className="min-w-0">
-                      <p
-                        className={`text-[15px] ${
-                          item.read
-                            ? "font-medium text-gray-500"
-                            : "font-semibold text-ink"
-                        }`}
-                      >
-                        {item.title}
-                      </p>
-                      <p className="mt-0.5 text-[13px] text-muted">
+                    <span className="min-w-0 flex-1">
+                      <span className="flex items-center gap-2">
+                        <span
+                          className={`text-[15px] ${
+                            item.read
+                              ? "font-medium text-gray-500"
+                              : "font-semibold text-ink"
+                          }`}
+                        >
+                          {item.title}
+                        </span>
+                        {item.read && (
+                          <span className="flex shrink-0 items-center gap-0.5 rounded bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-500">
+                            <Check aria-hidden="true" className="h-2.5 w-2.5" />
+                            Read
+                          </span>
+                        )}
+                      </span>
+                      <span className="mt-0.5 block text-[13px] text-muted">
                         {item.detail}
-                      </p>
-                      <p className="mt-0.5 text-[13px] text-gray-400">
+                      </span>
+                      <span className="mt-0.5 block text-[13px] text-gray-400">
                         {item.time}
-                      </p>
-                    </div>
-                  </div>
+                      </span>
+                    </span>
+                  </button>
                 </li>
               ))}
             </ul>
