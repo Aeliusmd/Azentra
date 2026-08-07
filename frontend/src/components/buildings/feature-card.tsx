@@ -21,10 +21,11 @@ export function FeatureCard({
   href,
   gradient,
 }: FeatureCardProps) {
+  // Lifts and zooms slightly on hover/focus; held still for reduced motion.
   return (
     <Link
       href={href}
-      className={`group relative flex min-h-[220px] flex-col overflow-hidden rounded-xl bg-linear-to-br p-6 text-white shadow-sm transition-shadow hover:shadow-lg focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 focus-visible:outline-none ${gradient}`}
+      className={`group relative flex min-h-[220px] flex-col overflow-hidden rounded-xl bg-linear-to-br p-6 text-white shadow-sm transition-[transform,box-shadow] duration-200 ease-out will-change-transform hover:-translate-y-1 hover:scale-[1.02] hover:shadow-xl focus-visible:-translate-y-1 focus-visible:scale-[1.02] focus-visible:shadow-xl focus-visible:ring-2 focus-visible:ring-brand/50 focus-visible:ring-offset-2 focus-visible:outline-none motion-reduce:transition-none motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100 motion-reduce:focus-visible:translate-y-0 motion-reduce:focus-visible:scale-100 ${gradient}`}
     >
       {/* Decorative disc bleeding off the top-right corner */}
       <span

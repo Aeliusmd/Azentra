@@ -21,7 +21,7 @@ export function MiniStat({
   tone: MiniStatTone;
 }) {
   return (
-    <div className="rounded-lg border border-hairline bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04)]">
+    <div className="rounded-lg border border-hairline bg-white p-5 shadow-[0_1px_2px_rgba(16,24,40,0.04)] transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0">
       <span
         aria-hidden="true"
         className={`flex h-9 w-9 items-center justify-center rounded-lg ${TILES[tone]}`}

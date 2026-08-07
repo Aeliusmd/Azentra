@@ -7,11 +7,12 @@ import { ChevronDown } from "lucide-react";
 
 import { NotificationsMenu } from "@/components/dashboard/notifications-menu";
 import { useDismiss } from "@/hooks/use-dismiss";
-import { currentUser } from "@/lib/dashboard-data";
 import { navLabelFor } from "@/lib/nav";
+import { profileInitial, useProfile } from "@/lib/profile-store";
 
 export function Topbar() {
   const pathname = usePathname();
+  const profile = useProfile();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
@@ -46,15 +47,13 @@ export function Topbar() {
               aria-hidden="true"
               className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-600"
             >
-              {currentUser.initials}
+              {profileInitial(profile.name)}
             </span>
             <span className="hidden text-left sm:block">
               <span className="block text-[13px] font-semibold text-ink">
-                {currentUser.name}
+                {profile.name}
               </span>
-              <span className="block text-xs text-muted">
-                {currentUser.role}
-              </span>
+              <span className="block text-xs text-muted">{profile.role}</span>
             </span>
             <ChevronDown aria-hidden="true" className="h-4 w-4 text-gray-400" />
           </button>
@@ -66,7 +65,16 @@ export function Topbar() {
             >
               <Link
                 role="menuitem"
+                href="/admin/profile"
+                onClick={closeMenu}
+                className="block px-4 py-2 text-[13px] text-gray-600 hover:bg-gray-50 hover:text-ink"
+              >
+                My Profile
+              </Link>
+              <Link
+                role="menuitem"
                 href="/admin/settings"
+                onClick={closeMenu}
                 className="block px-4 py-2 text-[13px] text-gray-600 hover:bg-gray-50 hover:text-ink"
               >
                 Settings

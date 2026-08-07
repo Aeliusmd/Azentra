@@ -29,8 +29,16 @@ export const navItems: NavItem[] = [
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
+/** Routes that have a breadcrumb but no sidebar entry. */
+const EXTRA_LABELS: Record<string, string> = {
+  "/admin/profile": "My Profile",
+};
+
 /** Label shown as the trailing breadcrumb crumb for a given path. */
 export function navLabelFor(pathname: string): string {
+  const extra = EXTRA_LABELS[pathname];
+  if (extra) return extra;
+
   const match = navItems.find(
     (item) => pathname === item.href || pathname.startsWith(`${item.href}/`),
   );

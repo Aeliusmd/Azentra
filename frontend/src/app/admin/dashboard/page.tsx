@@ -9,14 +9,14 @@ import { TowerStatus } from "@/components/dashboard/tower-status";
 import { property, recentActivity, towers } from "@/lib/dashboard-data";
 
 export const metadata: Metadata = {
-  title: "Property Dashboard",
+  title: "Admin Dashboard",
 };
 
 export default function DashboardPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-ink">Property Dashboard</h1>
+        <h1 className="text-2xl font-bold text-ink">Admin Dashboard</h1>
         <p className="mt-1 text-[13px] text-muted">
           Overview of {property.name}
         </p>
