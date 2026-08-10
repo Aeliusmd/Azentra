@@ -136,7 +136,7 @@ const sunrise: PmDashboard = {
   ],
 };
 
-const harbour: PmDashboard = {
+const greenValley: PmDashboard = {
   summary: {
     totalUnits: 96,
     occupied: 71,
@@ -194,7 +194,10 @@ const harbour: PmDashboard = {
   ],
 };
 
-const BY_PROPERTY: Record<string, PmDashboard> = { sunrise, harbour };
+const BY_PROPERTY: Record<string, PmDashboard> = {
+  sunrise,
+  "green-valley": greenValley,
+};
 
 export function dashboardFor(propertyId: string): PmDashboard {
   return BY_PROPERTY[propertyId] ?? sunrise;

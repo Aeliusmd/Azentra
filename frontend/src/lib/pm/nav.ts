@@ -91,6 +91,7 @@ export const pmNavGroups: PmNavGroup[] = [
       { label: "Calendar", href: `${PM_BASE}/calendar`, icon: CalendarDays },
       { label: "Reports", href: `${PM_BASE}/reports`, icon: ChartColumn },
       { label: "Notifications", href: `${PM_BASE}/notifications`, icon: Bell },
+      { label: "Settings", href: `${PM_BASE}/settings`, icon: Settings },
     ],
   },
 ];
@@ -100,7 +101,6 @@ const ALL_ITEMS = pmNavGroups.flatMap((group) => group.items);
 /** Routes reachable from the topbar rather than the rail. */
 const EXTRA_LABELS: Record<string, string> = {
   [`${PM_BASE}/profile`]: "My Profile",
-  [`${PM_BASE}/settings`]: "Settings",
 };
 
 /** Trailing breadcrumb crumb for a given path. */

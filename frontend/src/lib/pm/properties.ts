@@ -16,7 +16,7 @@ export type PmProperty = {
 
 export const assignedProperties: PmProperty[] = [
   { id: "sunrise", name: "Sunrise Residence" },
-  { id: "harbour", name: "Harbour View Apartments" },
+  { id: "green-valley", name: "Green Valley Towers" },
 ];
 
 let selectedId = assignedProperties[0].id;
