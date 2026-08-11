@@ -21,7 +21,7 @@ import { towers } from "./buildings-data";
  *    must never be the only cue — the legend, tooltip values and occupancy
  *    table all name the tower in text.
  */
-export const SERIES_COLORS = ["#4daa71", "#0c2a4c", "#f97316"] as const;
+export const SERIES_COLORS = ["#3C7FAF", "#EB5009", "#10968B"] as const;
 export const SERIES_LABELS = ["A", "B", "C"] as const;
 
 export type ReportTab = {

@@ -1,226 +1,181 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 
-import { Card } from "@/components/ui/card";
+import { AddTaskModal } from "@/components/pm/calendar/add-task-modal";
 import {
-  EVENT_COLOR,
-  EVENT_TYPES,
+  Legend,
+  MONTHS,
+  SHORT_MONTHS,
+  ViewSwitch,
+  type CalendarViewMode,
+} from "@/components/pm/calendar/calendar-parts";
+import { DayView } from "@/components/pm/calendar/day-view";
+import { MonthView } from "@/components/pm/calendar/month-view";
+import { WeekView } from "@/components/pm/calendar/week-view";
+import {
   TODAY,
   eventsOn,
+  fromIso,
   toIso,
+  weekOf,
+  type CalendarEvent,
 } from "@/lib/pm/calendar-data";
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+/** Label above the month/week/day arrows. */
+function periodLabel(view: CalendarViewMode, cursor: string, days: string[]) {
+  const date = fromIso(cursor);
 
-const [START_YEAR, START_MONTH] = [
-  Number(TODAY.slice(0, 4)),
-  Number(TODAY.slice(5, 7)) - 1,
-];
+  if (view === "Month")
+    return `${MONTHS[date.getMonth()]} ${date.getFullYear()}`;
 
-/** Day numbers for a month, padded with nulls so day 1 lands on its weekday. */
-function buildGrid(year: number, month: number) {
-  const firstWeekday = new Date(year, month, 1).getDay();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  if (view === "Day") {
+    return `${SHORT_MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+  }
 
-  const cells: (number | null)[] = Array.from(
-    { length: firstWeekday },
-    () => null,
-  );
-  for (let day = 1; day <= daysInMonth; day++) cells.push(day);
-  while (cells.length % 7 !== 0) cells.push(null);
+  const [first, last] = [fromIso(days[0]), fromIso(days[6])];
+  const start = `${SHORT_MONTHS[first.getMonth()]} ${first.getDate()}`;
+  const end =
+    first.getMonth() === last.getMonth()
+      ? `${last.getDate()}`
+      : `${SHORT_MONTHS[last.getMonth()]} ${last.getDate()}`;
 
-  return cells;
+  return `${start} - ${end}, ${last.getFullYear()}`;
+}
+
+/** Steps the cursor by one month, week or day. */
+function shift(view: CalendarViewMode, cursor: string, delta: number) {
+  const date = fromIso(cursor);
+
+  if (view === "Month") date.setMonth(date.getMonth() + delta, 1);
+  else if (view === "Week") date.setDate(date.getDate() + delta * 7);
+  else date.setDate(date.getDate() + delta);
+
+  return toIso(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
 export function CalendarView() {
-  const [year, setYear] = useState(START_YEAR);
-  const [month, setMonth] = useState(START_MONTH);
-  const [selected, setSelected] = useState(TODAY);
+  const [view, setView] = useState<CalendarViewMode>("Month");
+  /** The day the calendar is sitting on — drives every view. */
+  const [cursor, setCursor] = useState(TODAY);
+  const [addOpen, setAddOpen] = useState(false);
+  /** Tasks added in this session, kept alongside the mock events. */
+  const [added, setAdded] = useState<CalendarEvent[]>([]);
 
-  const cells = useMemo(() => buildGrid(year, month), [year, month]);
-  const selectedEvents = eventsOn(selected);
+  const days = useMemo(() => weekOf(cursor), [cursor]);
+  const getEvents = useMemo(
+    () => (iso: string) => eventsOn(iso, added),
+    [added],
+  );
 
-  function step(delta: number) {
-    const next = month + delta;
-    if (next < 0) {
-      setMonth(11);
-      setYear(year - 1);
-    } else if (next > 11) {
-      setMonth(0);
-      setYear(year + 1);
-    } else {
-      setMonth(next);
-    }
+  const cursorDate = fromIso(cursor);
+
+  function selectDay(iso: string) {
+    setCursor(iso);
+    setView("Day");
+  }
+
+  function addTask(task: Omit<CalendarEvent, "id">) {
+    setAdded((current) => [
+      ...current,
+      { ...task, id: `local-${current.length + 1}` },
+    ]);
+    setCursor(task.date);
+    setAddOpen(false);
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-[32px] leading-tight font-bold text-ink">Calendar</h1>
-        <p className="mt-1 text-[15px] text-muted">
-          Maintenance, inspections, bookings, and property events
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-[32px] leading-tight font-bold text-ink">
+            Calendar
+          </h1>
+          <p className="mt-1 text-[15px] text-muted">
+            Scheduled maintenance, inspections, bookings, and your tasks
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setAddOpen(true)}
+            className="flex items-center gap-2 rounded-lg bg-brand px-5 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:outline-none"
+          >
+            <Plus aria-hidden="true" className="h-[18px] w-[18px]" />
+            Add Task
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setCursor(shift(view, cursor, -1))}
+            aria-label={`Previous ${view.toLowerCase()}`}
+            className="rounded-lg border border-hairline p-2.5 text-gray-500 transition-colors hover:bg-gray-50 hover:text-ink focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:outline-none"
+          >
+            <ChevronLeft aria-hidden="true" className="h-4 w-4" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setCursor(TODAY)}
+            title="Jump to today"
+            className="min-w-[150px] rounded-lg px-2 py-2 text-center text-[17px] font-bold text-ink transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:outline-none"
+          >
+            {periodLabel(view, cursor, days)}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setCursor(shift(view, cursor, 1))}
+            aria-label={`Next ${view.toLowerCase()}`}
+            className="rounded-lg border border-hairline p-2.5 text-gray-500 transition-colors hover:bg-gray-50 hover:text-ink focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:outline-none"
+          >
+            <ChevronRight aria-hidden="true" className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
-        <Card className="p-5 xl:col-span-2">
-          <div className="flex items-center justify-between gap-4">
-            <h2 className="text-[17px] font-semibold text-ink">
-              {MONTHS[month]} {year}
-            </h2>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => step(-1)}
-                aria-label="Previous month"
-                className="rounded-md border border-hairline p-2 text-gray-500 transition-colors hover:bg-gray-50 hover:text-ink focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:outline-none"
-              >
-                <ChevronLeft aria-hidden="true" className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setYear(START_YEAR);
-                  setMonth(START_MONTH);
-                  setSelected(TODAY);
-                }}
-                className="rounded-md border border-hairline px-3 py-2 text-[13px] font-medium text-ink transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:outline-none"
-              >
-                Today
-              </button>
-              <button
-                type="button"
-                onClick={() => step(1)}
-                aria-label="Next month"
-                className="rounded-md border border-hairline p-2 text-gray-500 transition-colors hover:bg-gray-50 hover:text-ink focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:outline-none"
-              >
-                <ChevronRight aria-hidden="true" className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-5 grid grid-cols-7 gap-1">
-            {WEEKDAYS.map((day) => (
-              <div
-                key={day}
-                className="pb-2 text-center text-xs font-semibold tracking-wide text-gray-400 uppercase"
-              >
-                {day}
-              </div>
-            ))}
-
-            {cells.map((day, index) => {
-              if (day === null) {
-                return <div key={`pad-${index}`} className="aspect-square" />;
-              }
-
-              const iso = toIso(year, month, day);
-              const dayEvents = eventsOn(iso);
-              const isSelected = iso === selected;
-
-              return (
-                <button
-                  key={iso}
-                  type="button"
-                  onClick={() => setSelected(iso)}
-                  aria-pressed={isSelected}
-                  aria-label={`${day} ${MONTHS[month]} — ${dayEvents.length} events`}
-                  className={`flex aspect-square flex-col items-center justify-center gap-1.5 rounded-lg text-[15px] transition-colors focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:outline-none ${
-                    isSelected
-                      ? "bg-brand font-semibold text-white"
-                      : "text-ink hover:bg-gray-50"
-                  }`}
-                >
-                  {day}
-
-                  <span className="flex h-1.5 items-center gap-1">
-                    {dayEvents.slice(0, 3).map((event) => (
-                      <span
-                        key={event.id}
-                        aria-hidden="true"
-                        className="h-1.5 w-1.5 rounded-full"
-                        style={{
-                          background: isSelected
-                            ? "#ffffff"
-                            : EVENT_COLOR[event.type],
-                        }}
-                      />
-                    ))}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </Card>
-
-        <Card className="p-5">
-          <h2 className="text-[17px] font-semibold text-ink">{selected}</h2>
-
-          {selectedEvents.length === 0 ? (
-            <p className="mt-4 text-[15px] text-muted">
-              No events scheduled on this day.
-            </p>
-          ) : (
-            <ul className="mt-4 space-y-5">
-              {selectedEvents.map((event) => (
-                <li key={event.id} className="flex gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{ background: EVENT_COLOR[event.type] }}
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-[13px] text-gray-500">
-                      {event.time}
-                    </span>
-                    <span className="mt-0.5 block text-[15px] font-semibold text-ink">
-                      {event.title}
-                    </span>
-                    <span className="mt-0.5 block text-[13px] text-muted">
-                      {event.type}
-                    </span>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <div className="mt-7 border-t border-hairline pt-5">
-            <h3 className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
-              Event Types
-            </h3>
-            <ul className="mt-3 space-y-2.5">
-              {EVENT_TYPES.map((type) => (
-                <li key={type} className="flex items-center gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="h-2.5 w-2.5 rounded-full"
-                    style={{ background: EVENT_COLOR[type] }}
-                  />
-                  <span className="text-[15px] text-ink">{type}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Card>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <ViewSwitch value={view} onChange={setView} />
+        <Legend />
       </div>
+
+      {view === "Month" && (
+        <MonthView
+          year={cursorDate.getFullYear()}
+          month={cursorDate.getMonth()}
+          today={TODAY}
+          selected={cursor}
+          getEvents={getEvents}
+          onSelectDay={selectDay}
+        />
+      )}
+
+      {view === "Week" && (
+        <WeekView
+          days={days}
+          today={TODAY}
+          getEvents={getEvents}
+          onSelectDay={selectDay}
+        />
+      )}
+
+      {view === "Day" && (
+        <DayView
+          date={cursor}
+          events={getEvents(cursor)}
+          onAddTask={() => setAddOpen(true)}
+        />
+      )}
+
+      {addOpen && (
+        <AddTaskModal
+          date={cursor}
+          onClose={() => setAddOpen(false)}
+          onSubmit={addTask}
+        />
+      )}
     </div>
   );
 }
