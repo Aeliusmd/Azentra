@@ -67,10 +67,62 @@ body {
   animation: chart-grow 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* Progress slider that reads as a filled bar — `--fill` is the current value. */
+.progress-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    #e8a33d 0 var(--fill),
+    #f1f2f4 var(--fill) 100%
+  );
+  cursor: pointer;
+}
+.progress-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 2px solid #e8a33d;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.2);
+}
+.progress-range::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: #ffffff;
+  border: 2px solid #e8a33d;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.2);
+}
+.progress-range:focus-visible {
+  outline: 2px solid rgba(78, 163, 114, 0.5);
+  outline-offset: 3px;
+}
+
+/* Toast slides down from under the topbar. */
+@keyframes toast-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast-pop {
+  animation: toast-pop 180ms ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .chart-line,
   .chart-area,
-  .chart-bar {
+  .chart-bar,
+  .toast-pop {
     animation: none;
     stroke-dasharray: none;
   }

@@ -15,12 +15,15 @@ export function Modal({
   open,
   onClose,
   title,
+  subtitle,
   size = "md",
   children,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
+  /** Secondary line under the title, e.g. the record this dialog is about. */
+  subtitle?: string;
   size?: keyof typeof SIZES;
   children: React.ReactNode;
 }) {
@@ -89,9 +92,14 @@ export function Modal({
         className={`my-auto w-full overflow-hidden rounded-2xl bg-white shadow-xl ${SIZES[size]}`}
       >
         <div className="flex items-center justify-between gap-4 border-b border-hairline px-8 py-6">
-          <h2 id={titleId} className="text-[22px] font-bold text-ink">
-            {title}
-          </h2>
+          <div className="min-w-0">
+            <h2 id={titleId} className="text-[22px] font-bold text-ink">
+              {title}
+            </h2>
+            {subtitle && (
+              <p className="mt-1 text-[13px] text-muted">{subtitle}</p>
+            )}
+          </div>
           <button
             type="button"
             onClick={onClose}
