@@ -95,11 +95,14 @@ export type JobMaterial = {
 
 export type JobLabour = {
   id: string;
+  /** ISO `YYYY-MM-DD` the time was worked. */
+  date: string;
   /** 24h `HH:MM`. */
   start: string;
   end: string;
   /** Total worked, in minutes. */
   minutes: number;
+  note?: string;
 };
 
 /** The three evidence slots a technician fills as work progresses. */
@@ -233,6 +236,16 @@ const seed: JobSeed[] = [
     progress: 0,
     requester: "John Doe",
     requesterRole: "Resident",
+    labour: [
+      {
+        id: "MT-1045-l1",
+        date: "2026-08-11",
+        start: "10:30",
+        end: "13:00",
+        minutes: 150,
+        note: "Ceiling opened and riser isolated for inspection.",
+      },
+    ],
     assignedBy: SUPERVISOR,
     instructions:
       "Shut off the riser before opening the ceiling panel. Notify the unit below before starting.",
@@ -295,7 +308,16 @@ const seed: JobSeed[] = [
       },
       { id: "MT-1044-m2", name: "AC Filter", quantity: 1, unit: "unit" },
     ],
-    labour: [{ id: "MT-1044-l1", start: "09:00", end: "11:00", minutes: 120 }],
+    labour: [
+      {
+        id: "MT-1044-l1",
+        date: "2026-08-06",
+        start: "09:00",
+        end: "11:00",
+        minutes: 120,
+        note: "Filter cleaned and gas pressure checked.",
+      },
+    ],
   },
   {
     id: "MT-1042",
@@ -335,7 +357,16 @@ const seed: JobSeed[] = [
         unit: "unit",
       },
     ],
-    labour: [{ id: "MT-1042-l1", start: "07:30", end: "09:30", minutes: 120 }],
+    labour: [
+      {
+        id: "MT-1042-l1",
+        date: "2026-08-06",
+        start: "07:45",
+        end: "10:15",
+        minutes: 150,
+        note: "Thermostat replaced and heat cycle tested.",
+      },
+    ],
   },
   {
     id: "MT-1040",
@@ -417,6 +448,16 @@ const seed: JobSeed[] = [
     progress: 100,
     requester: "Building Staff",
     requesterRole: "Staff",
+    labour: [
+      {
+        id: "MT-1038-l1",
+        date: "2026-08-09",
+        start: "06:00",
+        end: "08:30",
+        minutes: 150,
+        note: "Four bulbs replaced from the scissor lift.",
+      },
+    ],
     assignedBy: SUPERVISOR,
     timeline: [
       { time: "2026-08-05 09:00", label: "Request created by Building Staff" },
@@ -442,6 +483,16 @@ const seed: JobSeed[] = [
     progress: 100,
     requester: "Sophia Thomas",
     requesterRole: "Resident",
+    labour: [
+      {
+        id: "MT-1035-l1",
+        date: "2026-08-02",
+        start: "09:00",
+        end: "11:00",
+        minutes: 120,
+        note: "Detector swapped for the same model and tested.",
+      },
+    ],
     assignedBy: SUPERVISOR,
     timeline: [
       { time: "2026-07-31 13:10", label: "Request created by Sophia Thomas" },

@@ -1,83 +1,125 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-
-import type { PillTone } from "@/components/pm/ui/pill";
+import {
+  CalendarCheck,
+  CircleAlert,
+  Package,
+  UserRoundCheck,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
 
 /**
  * Technician notifications. Module-level store so the topbar bell and the
  * notifications page stay in sync; resets on reload like the other mock stores.
  */
 
-export const SEVERITIES = ["Info", "Warning", "Error", "Success"] as const;
-export type Severity = (typeof SEVERITIES)[number];
+export const NOTIFICATION_KINDS = [
+  "Job",
+  "Material",
+  "Supervisor",
+  "Preventive",
+  "Emergency",
+] as const;
+export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 
-/** Filters offered on the notifications page. */
-export const SEVERITY_FILTERS = ["Info", "Warning", "Error"] as const;
-
-export const SEVERITY_DOT: Record<Severity, string> = {
-  Info: "bg-[#2e6cad]",
-  Warning: "bg-[#e8a33d]",
-  Error: "bg-rose-500",
-  Success: "bg-[#22a35c]",
+export const KIND_ICON: Record<NotificationKind, LucideIcon> = {
+  Job: Wrench,
+  Material: Package,
+  Supervisor: UserRoundCheck,
+  Preventive: CalendarCheck,
+  Emergency: CircleAlert,
 };
 
-export const SEVERITY_TONE: Record<Severity, PillTone> = {
-  Info: "navy",
-  Warning: "amber",
-  Error: "red",
-  Success: "green",
+/** Icon tile colours — emergencies red, material green, the rest navy. */
+export const KIND_CHIP: Record<NotificationKind, string> = {
+  Job: "bg-[#eef3f9] text-[#2e6cad]",
+  Material: "bg-green-50 text-green-600",
+  Supervisor: "bg-amber-50 text-amber-600",
+  Preventive: "bg-[#eef3f9] text-[#2e6cad]",
+  Emergency: "bg-rose-50 text-rose-600",
 };
 
 export type TechNotification = {
   id: string;
   title: string;
   detail: string;
+  /** Relative label, e.g. "30 min ago". */
   time: string;
-  severity: Severity;
+  kind: NotificationKind;
   read: boolean;
 };
 
 const seed: TechNotification[] = [
   {
     id: "tn1",
-    title: "New work order assigned",
-    detail: "WO-1042 Water Leakage — Unit A-304, Tower A. Priority: Emergency.",
-    time: "2026-08-11 07:05",
-    severity: "Error",
+    title: "New Maintenance Job",
+    detail:
+      "Water leakage reported in Unit A-304. Priority: Emergency. Scheduled: Today 10:30 AM.",
+    time: "30 min ago",
+    kind: "Job",
     read: false,
   },
   {
     id: "tn2",
-    title: "Priority changed",
-    detail: "WO-1038 Water Heater Malfunction raised from High to Emergency.",
-    time: "2026-08-11 06:40",
-    severity: "Warning",
+    title: "Job Priority Changed",
+    detail:
+      "Kitchen sink drain job (MT-1032) priority changed from Low to Medium.",
+    time: "1 hr ago",
+    kind: "Job",
     read: false,
   },
   {
     id: "tn3",
-    title: "Preventive maintenance due",
-    detail: "Generator 500kVA quarterly service is due on Aug 15.",
-    time: "2026-08-10 16:20",
-    severity: "Info",
-    read: false,
+    title: "Material Request Approved",
+    detail: "Thermocouple request (RQ-002) approved. Pick up from Warehouse A.",
+    time: "2 hrs ago",
+    kind: "Material",
+    read: true,
   },
   {
     id: "tn4",
-    title: "Schedule changed",
-    detail: "WO-1044 Bedroom Power Outlets moved to 02:00 PM today.",
-    time: "2026-08-10 14:10",
-    severity: "Info",
+    title: "Supervisor Comment",
+    detail:
+      'Carlos Rivera: "Please prioritize the water heater job first - resident has no hot water."',
+    time: "3 hrs ago",
+    kind: "Supervisor",
     read: true,
   },
   {
     id: "tn5",
-    title: "Completion approved",
+    title: "Job Rescheduled",
     detail:
-      "WO-1031 Lobby chandelier bulb replacement was approved by James Wilson.",
-    time: "2026-08-09 17:45",
-    severity: "Success",
+      "Intercom repair (MT-1039) rescheduled to Aug 13 due to delayed parts delivery.",
+    time: "5 hrs ago",
+    kind: "Job",
+    read: true,
+  },
+  {
+    id: "tn6",
+    title: "Preventive Maintenance Due",
+    detail: "Gym HVAC quarterly maintenance is overdue. Next due: Aug 10.",
+    time: "Yesterday",
+    kind: "Preventive",
+    read: false,
+  },
+  {
+    id: "tn7",
+    title: "Job Completion Approved",
+    detail:
+      "Lobby chandelier job (MT-1038) approved by Carlos Rivera. Well done!",
+    time: "Yesterday",
+    kind: "Job",
+    read: true,
+  },
+  {
+    id: "tn8",
+    title: "Emergency Job Alert",
+    detail:
+      "Water pipe burst reported in Tower B Unit B-602. Immediate response required.",
+    time: "Yesterday",
+    kind: "Emergency",
     read: true,
   },
 ];

@@ -7,7 +7,8 @@ import { Bell } from "lucide-react";
 import { useDismiss } from "@/hooks/use-dismiss";
 import { TECH_BASE } from "@/lib/tech/nav";
 import {
-  SEVERITY_DOT,
+  KIND_CHIP,
+  KIND_ICON,
   markAllRead,
   markRead,
   unreadCount,
@@ -70,39 +71,47 @@ export function TechNotificationsMenu() {
             </p>
           ) : (
             <ul className="py-2">
-              {items.slice(0, PREVIEW_COUNT).map((item) => (
-                <li key={item.id}>
-                  <button
-                    type="button"
-                    onClick={() => markRead(item.id)}
-                    className="flex w-full gap-3 px-5 py-3.5 text-left transition-colors hover:bg-gray-50"
-                  >
-                    <span
-                      aria-hidden="true"
-                      className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${
-                        item.read ? "bg-gray-300" : SEVERITY_DOT[item.severity]
-                      }`}
-                    />
-                    <span className="min-w-0 flex-1">
+              {items.slice(0, PREVIEW_COUNT).map((item) => {
+                const Icon = KIND_ICON[item.kind];
+
+                return (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      onClick={() => markRead(item.id)}
+                      className="flex w-full gap-3 px-5 py-3.5 text-left transition-colors hover:bg-gray-50"
+                    >
                       <span
-                        className={`block text-[15px] ${
+                        aria-hidden="true"
+                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
                           item.read
-                            ? "font-medium text-gray-500"
-                            : "font-semibold text-ink"
+                            ? "bg-gray-100 text-gray-400"
+                            : KIND_CHIP[item.kind]
                         }`}
                       >
-                        {item.title}
+                        <Icon className="h-4 w-4" />
                       </span>
-                      <span className="mt-0.5 block text-[15px] text-muted">
-                        {item.detail}
+                      <span className="min-w-0 flex-1">
+                        <span
+                          className={`block text-[15px] ${
+                            item.read
+                              ? "font-medium text-gray-500"
+                              : "font-semibold text-ink"
+                          }`}
+                        >
+                          {item.title}
+                        </span>
+                        <span className="mt-0.5 block text-[15px] text-muted">
+                          {item.detail}
+                        </span>
+                        <span className="mt-1 block text-[13px] text-gray-400">
+                          {item.time}
+                        </span>
                       </span>
-                      <span className="mt-1 block text-[13px] text-gray-400">
-                        {item.time}
-                      </span>
-                    </span>
-                  </button>
-                </li>
-              ))}
+                    </button>
+                  </li>
+                );
+              })}
             </ul>
           )}
 

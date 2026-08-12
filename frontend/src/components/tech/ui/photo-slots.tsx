@@ -3,20 +3,34 @@
 import { useRef } from "react";
 import { Plus, X } from "lucide-react";
 
-import { PHOTO_SLOTS, type Job, type PhotoSlot } from "@/lib/tech/jobs-data";
 import {
-  removeJobPhoto,
-  setJobPhoto,
-  setJobPhotoCaption,
-} from "@/lib/tech/jobs-store";
+  PHOTO_SLOTS,
+  type JobPhoto,
+  type PhotoSlot,
+} from "@/lib/tech/jobs-data";
 
 /**
- * Before / During / After evidence. Frontend only — the picked file is previewed
- * from an object URL and never uploaded.
+ * Before / During / After evidence, shared by work orders and preventive tasks.
+ * Frontend only — the picked file is previewed from an object URL and never
+ * uploaded, so the owner just stores what comes back.
  */
-function Slot({ job, slot }: { job: Job; slot: PhotoSlot }) {
+
+type PhotoHandlers = {
+  photos: Partial<Record<PhotoSlot, JobPhoto>>;
+  onPick: (slot: PhotoSlot, photo: JobPhoto) => void;
+  onCaption: (slot: PhotoSlot, caption: string) => void;
+  onRemove: (slot: PhotoSlot) => void;
+};
+
+function Slot({
+  slot,
+  photos,
+  onPick,
+  onCaption,
+  onRemove,
+}: PhotoHandlers & { slot: PhotoSlot }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const photo = job.photos[slot];
+  const photo = photos[slot];
 
   return (
     <div>
@@ -29,7 +43,7 @@ function Slot({ job, slot }: { job: Job; slot: PhotoSlot }) {
         onChange={(event) => {
           const file = event.target.files?.[0];
           if (!file) return;
-          setJobPhoto(job.id, slot, {
+          onPick(slot, {
             url: URL.createObjectURL(file),
             name: file.name,
             caption: "",
@@ -51,7 +65,7 @@ function Slot({ job, slot }: { job: Job; slot: PhotoSlot }) {
             />
             <button
               type="button"
-              onClick={() => removeJobPhoto(job.id, slot)}
+              onClick={() => onRemove(slot)}
               aria-label={`Remove ${slot} photo`}
               className="absolute top-1.5 right-1.5 rounded-full bg-gray-900/70 p-1 text-white transition-colors hover:bg-gray-900"
             >
@@ -61,9 +75,7 @@ function Slot({ job, slot }: { job: Job; slot: PhotoSlot }) {
 
           <input
             value={photo.caption}
-            onChange={(event) =>
-              setJobPhotoCaption(job.id, slot, event.target.value)
-            }
+            onChange={(event) => onCaption(slot, event.target.value)}
             placeholder="Add description..."
             aria-label={`${slot} photo description`}
             className="w-full border-t border-hairline px-2.5 py-2 text-[13px] text-ink placeholder:text-gray-400 focus:outline-none"
@@ -83,11 +95,11 @@ function Slot({ job, slot }: { job: Job; slot: PhotoSlot }) {
   );
 }
 
-export function PhotoSlots({ job }: { job: Job }) {
+export function PhotoSlots(props: PhotoHandlers) {
   return (
     <div className="grid grid-cols-3 gap-3">
       {PHOTO_SLOTS.map((slot) => (
-        <Slot key={slot} job={job} slot={slot} />
+        <Slot key={slot} slot={slot} {...props} />
       ))}
     </div>
   );

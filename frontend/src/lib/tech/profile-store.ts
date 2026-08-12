@@ -12,25 +12,39 @@ import { useSyncExternalStore } from "react";
 
 export type TechProfile = {
   name: string;
+  role: string;
+  employeeId: string;
   email: string;
   phone: string;
-  role: string;
-  /** Trade the technician is certified for. */
-  specialty: string;
-  employeeId: string;
+  emergencyContact: string;
+  /** Set by the office — the technician cannot reassign themselves. */
   property: string;
-  joined: string;
+  status: string;
+  specializations: string[];
+  stats: {
+    totalJobs: number;
+    completed: number;
+    emergencyJobs: number;
+    preventiveJobs: number;
+  };
 };
 
 const initial: TechProfile = {
   name: "John Martinez",
-  email: "john.martinez@azentra.com",
-  phone: "+1 555 0142",
   role: "Technician",
-  specialty: "Plumbing & HVAC",
-  employeeId: "TECH-014",
+  employeeId: "EMP-TECH-001",
+  email: "tech@azentra.com",
+  phone: "+1 555 0201",
+  emergencyContact: "+1 555 0202",
   property: "Sunrise Residence",
-  joined: "2024-02-05",
+  status: "Active",
+  specializations: ["Plumbing", "Electrical", "HVAC"],
+  stats: {
+    totalJobs: 142,
+    completed: 128,
+    emergencyJobs: 12,
+    preventiveJobs: 18,
+  },
 };
 
 let profile = initial;

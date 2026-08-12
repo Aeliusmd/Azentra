@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Camera, Clock, NotebookPen, Package, X } from "lucide-react";
 
 import { SelectField } from "@/components/pm/ui/select-field";
-import { PhotoSlots } from "@/components/tech/my-work/photo-upload";
+import { PhotoSlots } from "@/components/tech/ui/photo-slots";
 import { FieldLabel, controlClasses } from "@/components/ui/field";
 import { Modal } from "@/components/ui/modal";
 import {
@@ -22,6 +22,9 @@ import {
   addJobNote,
   removeJobLabour,
   removeJobMaterial,
+  removeJobPhoto,
+  setJobPhoto,
+  setJobPhotoCaption,
 } from "@/lib/tech/jobs-store";
 
 const SECTION_HEAD = "flex items-center gap-2 text-[15px] font-bold text-ink";
@@ -319,7 +322,7 @@ function Labour({ job }: { job: Job }) {
             <button
               type="button"
               onClick={() => {
-                addJobLabour(job.id, { start, end, minutes });
+                addJobLabour(job.id, { date: job.date, start, end, minutes });
                 setAdding(false);
               }}
               className="rounded-lg bg-brand px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:outline-none"
@@ -415,7 +418,14 @@ export function WorkLogModal({
             Photos
           </h3>
           <div className="mt-3">
-            <PhotoSlots job={job} />
+            <PhotoSlots
+              photos={job.photos}
+              onPick={(slot, photo) => setJobPhoto(job.id, slot, photo)}
+              onCaption={(slot, caption) =>
+                setJobPhotoCaption(job.id, slot, caption)
+              }
+              onRemove={(slot) => removeJobPhoto(job.id, slot)}
+            />
           </div>
         </section>
 

@@ -2,9 +2,14 @@
 
 import { useState } from "react";
 
-import { PhotoSlots } from "@/components/tech/my-work/photo-upload";
+import { PhotoSlots } from "@/components/tech/ui/photo-slots";
 import { FieldLabel, controlClasses } from "@/components/ui/field";
 import { Modal } from "@/components/ui/modal";
+import {
+  removeJobPhoto,
+  setJobPhoto,
+  setJobPhotoCaption,
+} from "@/lib/tech/jobs-store";
 import {
   JOB_RESULTS,
   type Job,
@@ -113,7 +118,14 @@ export function CompleteJobModal({
 
           <div>
             <p className="mb-2 text-[13px] font-semibold text-ink">Photos</p>
-            <PhotoSlots job={job} />
+            <PhotoSlots
+              photos={job.photos}
+              onPick={(slot, photo) => setJobPhoto(job.id, slot, photo)}
+              onCaption={(slot, caption) =>
+                setJobPhotoCaption(job.id, slot, caption)
+              }
+              onRemove={(slot) => removeJobPhoto(job.id, slot)}
+            />
           </div>
         </div>
 
