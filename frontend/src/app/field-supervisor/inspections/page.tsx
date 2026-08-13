@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
 
-import { FsSectionPlaceholder } from "@/components/fs/ui/section-placeholder";
+import { FsInspectionsView } from "@/components/fs/inspections/inspections-view";
 
 export const metadata: Metadata = {
-  title: "Inspection Reports",
+  title: "Inspections",
 };
 
 export default function FsInspectionsPage() {
-  return (
-    <FsSectionPlaceholder
-      title="Inspection Reports"
-      subtitle="Sign-off checklists, findings and follow-up actions"
-    />
-  );
+  return <FsInspectionsView />;
 }

@@ -14,6 +14,7 @@ import {
   WorkOrderActionModal,
   type WorkOrderAction,
 } from "@/components/fs/work-orders/work-order-action-modals";
+import { FsPhotoTiles } from "@/components/fs/ui/photo-tiles";
 import { Pill } from "@/components/pm/ui/pill";
 import { Modal } from "@/components/ui/modal";
 import { showFsToast } from "@/lib/fs/toast-store";
@@ -126,6 +127,7 @@ export function WorkOrderDetailModal({
             />
             <Detail label="Type" value={order.workType ?? order.category} />
             <Detail label="Due" value={order.dueDate} />
+            {order.asset && <Detail label="Asset" value={order.asset} />}
           </dl>
 
           {order.checklist && order.checklist.length > 0 && (
@@ -161,6 +163,13 @@ export function WorkOrderDetailModal({
                   </li>
                 ))}
               </ul>
+            </section>
+          )}
+
+          {order.photos.length > 0 && (
+            <section>
+              <h4 className={SECTION}>Photos</h4>
+              <FsPhotoTiles photos={order.photos} />
             </section>
           )}
 

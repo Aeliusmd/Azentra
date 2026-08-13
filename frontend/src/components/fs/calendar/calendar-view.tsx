@@ -25,8 +25,8 @@ import {
 } from "@/lib/fs/calendar-data";
 import { useFsCalendarEvents } from "@/lib/fs/calendar-store";
 import { TODAY } from "@/lib/fs/dashboard-data";
-import { inspections } from "@/lib/fs/inspections-data";
-import { preventiveTasks } from "@/lib/fs/preventive-data";
+import { useFsInspections } from "@/lib/fs/inspections-store";
+import { useFsPreventiveTasks } from "@/lib/fs/preventive-store";
 import { useFsSiteVisits } from "@/lib/fs/site-visits-store";
 import { useFsWorkOrders } from "@/lib/fs/work-orders-store";
 
@@ -47,6 +47,8 @@ function shift(view: View, cursor: string, delta: number) {
 export function FsCalendarView() {
   const orders = useFsWorkOrders();
   const visits = useFsSiteVisits();
+  const inspections = useFsInspections();
+  const preventive = useFsPreventiveTasks();
   const extras = useFsCalendarEvents();
 
   const [view, setView] = useState<View>("Week");
@@ -62,10 +64,10 @@ export function FsCalendarView() {
         orders,
         visits,
         inspections,
-        preventive: preventiveTasks,
+        preventive,
         extras,
       }).filter((event) => !hidden.includes(event.type)),
-    [orders, visits, extras, hidden],
+    [orders, visits, inspections, preventive, extras, hidden],
   );
 
   const days = useMemo(() => workWeekOf(cursor), [cursor]);

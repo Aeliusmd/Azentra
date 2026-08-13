@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
 
-import { FsSectionPlaceholder } from "@/components/fs/ui/section-placeholder";
+import { FsEmergencyJobsView } from "@/components/fs/emergency-jobs/emergency-jobs-view";
 
 export const metadata: Metadata = {
   title: "Emergency Jobs",
 };
 
 export default function FsEmergencyJobsPage() {
-  return (
-    <FsSectionPlaceholder
-      title="Emergency Jobs"
-      subtitle="Critical work that needs a technician on site now"
-    />
-  );
+  return <FsEmergencyJobsView />;
 }

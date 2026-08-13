@@ -148,7 +148,6 @@ export function CreateSiteVisitModal({ onClose }: { onClose: () => void }) {
 
         <FsModalFooter
           onCancel={onClose}
-          tone="amber"
           label="Create Site Visit"
           disabled={!ready}
         />

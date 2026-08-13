@@ -25,6 +25,14 @@ export const AVAILABILITY_TONE: Record<TechAvailability, PillTone> = {
   Unavailable: "red",
 };
 
+/** Leading dot on a roster card — availability read before the label is. */
+export const AVAILABILITY_DOT: Record<TechAvailability, string> = {
+  Available: "bg-[#3f9e63]",
+  Working: "bg-[#3f9e63]",
+  "On Break": "bg-[#e8a33d]",
+  Unavailable: "bg-[#e0554d]",
+};
+
 /** Tinted count tiles on the dashboard's technician status panel. */
 export const AVAILABILITY_TILE: Record<
   TechAvailability,
@@ -54,8 +62,19 @@ export type FsTechnician = {
   rating: number;
   phone: string;
   email: string;
-  /** Shift the technician is rostered on today. */
-  shift: string;
+  /**
+   * Shifts from today onwards, one entry per day: hours like `08:00 - 17:00`,
+   * or `Off` / `Leave`. Five days is as far ahead as the roster is published.
+   */
+  roster: string[];
+  /** Career totals alongside `completedJobs` — the record, not today's load. */
+  emergencyJobs: number;
+  /** Jobs that came back after being closed. */
+  reopenedJobs: number;
+  /** Median minutes from an emergency being raised to being on site. */
+  emergencyResponseMins: number;
+  /** Material lines drawn from stores. */
+  materialsUsed: number;
 };
 
 /**
@@ -77,7 +96,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.8,
     phone: "+1 555 0211",
     email: "john.perera@azentra.com",
-    shift: "08:00 - 17:00",
+    roster: [
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "Off",
+    ],
+    emergencyJobs: 14,
+    reopenedJobs: 3,
+    emergencyResponseMins: 16,
+    materialsUsed: 62,
   },
   {
     id: "T-02",
@@ -93,7 +122,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.6,
     phone: "+1 555 0212",
     email: "michael.torres@azentra.com",
-    shift: "07:00 - 16:00",
+    roster: [
+      "07:00 - 16:00",
+      "07:00 - 16:00",
+      "07:00 - 16:00",
+      "07:00 - 16:00",
+      "Off",
+    ],
+    emergencyJobs: 18,
+    reopenedJobs: 6,
+    emergencyResponseMins: 22,
+    materialsUsed: 54,
   },
   {
     id: "T-03",
@@ -109,7 +148,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.7,
     phone: "+1 555 0213",
     email: "david.chen@azentra.com",
-    shift: "08:00 - 17:00",
+    roster: [
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "Off",
+    ],
+    emergencyJobs: 9,
+    reopenedJobs: 4,
+    emergencyResponseMins: 14,
+    materialsUsed: 47,
   },
   {
     id: "T-04",
@@ -125,7 +174,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.4,
     phone: "+1 555 0214",
     email: "luis.fernandez@azentra.com",
-    shift: "09:00 - 18:00",
+    roster: [
+      "09:00 - 18:00",
+      "09:00 - 18:00",
+      "09:00 - 18:00",
+      "Leave",
+      "Off",
+    ],
+    emergencyJobs: 7,
+    reopenedJobs: 7,
+    emergencyResponseMins: 19,
+    materialsUsed: 51,
   },
   {
     id: "T-05",
@@ -141,7 +200,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.7,
     phone: "+1 555 0215",
     email: "ahmed.khan@azentra.com",
-    shift: "08:00 - 17:00",
+    roster: [
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "Off",
+    ],
+    emergencyJobs: 11,
+    reopenedJobs: 4,
+    emergencyResponseMins: 17,
+    materialsUsed: 58,
   },
   {
     id: "T-06",
@@ -157,7 +226,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.6,
     phone: "+1 555 0216",
     email: "sarah.wilson@azentra.com",
-    shift: "08:00 - 17:00",
+    roster: [
+      "08:00 - 17:00",
+      "Off",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+    ],
+    emergencyJobs: 8,
+    reopenedJobs: 5,
+    emergencyResponseMins: 21,
+    materialsUsed: 44,
   },
   {
     id: "T-07",
@@ -173,7 +252,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.5,
     phone: "+1 555 0217",
     email: "ravi.patel@azentra.com",
-    shift: "07:00 - 16:00",
+    roster: [
+      "07:00 - 16:00",
+      "07:00 - 16:00",
+      "07:00 - 16:00",
+      "07:00 - 16:00",
+      "Off",
+    ],
+    emergencyJobs: 12,
+    reopenedJobs: 5,
+    emergencyResponseMins: 15,
+    materialsUsed: 39,
   },
   {
     id: "T-08",
@@ -189,7 +278,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.2,
     phone: "+1 555 0218",
     email: "tom.harrison@azentra.com",
-    shift: "09:00 - 18:00",
+    roster: [
+      "09:00 - 18:00",
+      "09:00 - 18:00",
+      "09:00 - 18:00",
+      "09:00 - 18:00",
+      "Off",
+    ],
+    emergencyJobs: 6,
+    reopenedJobs: 9,
+    emergencyResponseMins: 26,
+    materialsUsed: 36,
   },
   {
     id: "T-09",
@@ -205,7 +304,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.6,
     phone: "+1 555 0219",
     email: "priya.nair@azentra.com",
-    shift: "08:00 - 17:00",
+    roster: [
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "Leave",
+      "Leave",
+      "Off",
+    ],
+    emergencyJobs: 4,
+    reopenedJobs: 2,
+    emergencyResponseMins: 13,
+    materialsUsed: 28,
   },
   {
     id: "T-10",
@@ -221,7 +330,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.9,
     phone: "+1 555 0220",
     email: "samuel.oduya@azentra.com",
-    shift: "08:00 - 17:00",
+    roster: [
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 12:00",
+    ],
+    emergencyJobs: 15,
+    reopenedJobs: 1,
+    emergencyResponseMins: 11,
+    materialsUsed: 22,
   },
   {
     id: "T-11",
@@ -237,7 +356,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.3,
     phone: "+1 555 0221",
     email: "hannah.berg@azentra.com",
-    shift: "10:00 - 19:00",
+    roster: [
+      "10:00 - 19:00",
+      "10:00 - 19:00",
+      "10:00 - 19:00",
+      "10:00 - 19:00",
+      "Off",
+    ],
+    emergencyJobs: 3,
+    reopenedJobs: 4,
+    emergencyResponseMins: 24,
+    materialsUsed: 26,
   },
   {
     id: "T-12",
@@ -253,7 +382,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.1,
     phone: "+1 555 0222",
     email: "diego.alvarez@azentra.com",
-    shift: "09:00 - 18:00",
+    roster: [
+      "09:00 - 18:00",
+      "Off",
+      "09:00 - 18:00",
+      "09:00 - 18:00",
+      "Off",
+    ],
+    emergencyJobs: 2,
+    reopenedJobs: 6,
+    emergencyResponseMins: 28,
+    materialsUsed: 31,
   },
   {
     id: "T-13",
@@ -269,7 +408,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.3,
     phone: "+1 555 0223",
     email: "omar.haddad@azentra.com",
-    shift: "On leave until 15 Aug",
+    roster: [
+      "Leave",
+      "Leave",
+      "Leave",
+      "08:00 - 17:00",
+      "Off",
+    ],
+    emergencyJobs: 9,
+    reopenedJobs: 6,
+    emergencyResponseMins: 20,
+    materialsUsed: 41,
   },
 
   /* --------------------------- Green Valley Towers ------------------------ */
@@ -287,7 +436,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.6,
     phone: "+1 555 0231",
     email: "nadia.rahman@azentra.com",
-    shift: "08:00 - 17:00",
+    roster: [
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "Off",
+    ],
+    emergencyJobs: 10,
+    reopenedJobs: 4,
+    emergencyResponseMins: 18,
+    materialsUsed: 43,
   },
   {
     id: "T-22",
@@ -303,7 +462,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.4,
     phone: "+1 555 0232",
     email: "kevin.silva@azentra.com",
-    shift: "08:00 - 17:00",
+    roster: [
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "Off",
+    ],
+    emergencyJobs: 7,
+    reopenedJobs: 5,
+    emergencyResponseMins: 21,
+    materialsUsed: 37,
   },
   {
     id: "T-23",
@@ -319,7 +488,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.2,
     phone: "+1 555 0233",
     email: "grace.lee@azentra.com",
-    shift: "07:00 - 16:00",
+    roster: [
+      "07:00 - 16:00",
+      "07:00 - 16:00",
+      "07:00 - 16:00",
+      "07:00 - 16:00",
+      "Off",
+    ],
+    emergencyJobs: 11,
+    reopenedJobs: 8,
+    emergencyResponseMins: 25,
+    materialsUsed: 40,
   },
   {
     id: "T-24",
@@ -335,7 +514,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.5,
     phone: "+1 555 0234",
     email: "marco.rossi@azentra.com",
-    shift: "08:00 - 17:00",
+    roster: [
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "08:00 - 17:00",
+      "Leave",
+      "Off",
+    ],
+    emergencyJobs: 5,
+    reopenedJobs: 3,
+    emergencyResponseMins: 16,
+    materialsUsed: 29,
   },
   {
     id: "T-25",
@@ -351,7 +540,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.6,
     phone: "+1 555 0235",
     email: "elena.popescu@azentra.com",
-    shift: "09:00 - 18:00",
+    roster: [
+      "09:00 - 18:00",
+      "09:00 - 18:00",
+      "09:00 - 18:00",
+      "09:00 - 18:00",
+      "Off",
+    ],
+    emergencyJobs: 2,
+    reopenedJobs: 2,
+    emergencyResponseMins: 14,
+    materialsUsed: 19,
   },
   {
     id: "T-26",
@@ -367,7 +566,17 @@ export const technicians: FsTechnician[] = [
     rating: 4.3,
     phone: "+1 555 0236",
     email: "bilal.aziz@azentra.com",
-    shift: "09:00 - 18:00",
+    roster: [
+      "09:00 - 18:00",
+      "Off",
+      "09:00 - 18:00",
+      "09:00 - 18:00",
+      "Off",
+    ],
+    emergencyJobs: 6,
+    reopenedJobs: 3,
+    emergencyResponseMins: 19,
+    materialsUsed: 17,
   },
 ];
 
@@ -392,6 +601,44 @@ export function activeJobCount(orders: FsWorkOrder[], name: string) {
   return orders.filter(
     (order) => order.technician === name && order.status !== "Completed",
   ).length;
+}
+
+/** Days of roster published ahead — today plus the four that follow. */
+export const ROSTER_DAYS = 5;
+
+/** The two entries that mean "not on site" rather than a set of hours. */
+export const OFF = "Off";
+export const ON_LEAVE = "Leave";
+
+/** A rostered day is one with hours against it. */
+export function isOnDuty(day: string) {
+  return day !== OFF && day !== ON_LEAVE;
+}
+
+/**
+ * Hours a technician has booked on a given day, read off the labour lines on
+ * every job rather than stored — a logged hour belongs to the work order.
+ */
+export function hoursLoggedOn(
+  orders: FsWorkOrder[],
+  name: string,
+  date: string,
+) {
+  return orders.reduce(
+    (total, order) =>
+      total +
+      order.labour
+        .filter((line) => line.technician === name && line.date === date)
+        .reduce((sum, line) => sum + line.hours, 0),
+    0,
+  );
+}
+
+/** `3.2` → `3h 12m`. */
+export function durationLabel(hours: number) {
+  const whole = Math.floor(hours);
+  const minutes = Math.round((hours - whole) * 60);
+  return minutes === 0 ? `${whole}h` : `${whole}h ${minutes}m`;
 }
 
 /** Bar colour follows load, not availability — a full plate always reads red. */

@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
 
-import { FsSectionPlaceholder } from "@/components/fs/ui/section-placeholder";
+import { FsAssignmentsView } from "@/components/fs/assignments/assignments-view";
 
 export const metadata: Metadata = {
   title: "Assignments",
 };
 
 export default function FsAssignmentsPage() {
-  return (
-    <FsSectionPlaceholder
-      title="Assignments"
-      subtitle="Match unassigned jobs to the right technician"
-    />
-  );
+  return <FsAssignmentsView />;
 }

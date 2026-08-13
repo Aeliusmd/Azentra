@@ -75,6 +75,8 @@ export type NewWorkOrderInput = {
    */
   location: string;
   building?: string;
+  /** Plant or equipment the job is about. Blank when none was named. */
+  asset?: string;
   description: string;
   source?: FsWorkOrderSource;
   workType?: FsWorkType;
@@ -104,6 +106,7 @@ export function createWorkOrder(input: NewWorkOrderInput) {
     property: propertyName(input.propertyId),
     building,
     location,
+    asset: input.asset || undefined,
     category: "General",
     workType: input.workType,
     checklist:

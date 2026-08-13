@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 
 import { propertyName } from "@/lib/fs/properties";
 import {
+  checksFor,
   nextSiteVisitId,
   siteVisits as seed,
   type SiteVisit,
@@ -59,6 +60,7 @@ export function addSiteVisit(input: NewSiteVisitInput) {
     purpose: input.purpose,
     summary: input.summary || input.purpose,
     status: "Scheduled",
+    checklist: checksFor(input.purpose, id),
     observations: "",
     notes: "",
     photos: [],
@@ -74,6 +76,21 @@ export function addSiteVisit(input: NewSiteVisitInput) {
 export function setSiteVisitStatus(id: string, status: SiteVisitStatus) {
   visits = visits.map((visit) =>
     visit.id === id ? { ...visit, status } : visit,
+  );
+  emit();
+}
+
+/** Ticked on site as the supervisor works down the round. */
+export function toggleVisitCheck(id: string, itemId: string) {
+  visits = visits.map((visit) =>
+    visit.id === id
+      ? {
+          ...visit,
+          checklist: visit.checklist.map((item) =>
+            item.id === itemId ? { ...item, done: !item.done } : item,
+          ),
+        }
+      : visit,
   );
   emit();
 }

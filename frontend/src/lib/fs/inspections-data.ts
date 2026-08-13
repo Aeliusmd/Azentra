@@ -38,6 +38,55 @@ export type InspectionCheck = {
   note?: string;
 };
 
+/**
+ * What each kind of inspection covers. The seeded rounds carry hand-written
+ * lists; this is what a round raised from the form starts with, so a new
+ * inspection is never an empty checklist.
+ */
+export const INSPECTION_CHECKLISTS: Record<InspectionType, string[]> = {
+  "Completed Work": [
+    "Work matches the agreed scope",
+    "Finish and workmanship acceptable",
+    "Area left clean and safe",
+    "Resident or requester signed off",
+  ],
+  Equipment: [
+    "Runs through a full cycle",
+    "No abnormal noise or vibration",
+    "Guards and isolators in place",
+    "Service label updated",
+  ],
+  "Repair Quality": [
+    "Fault no longer reproducible",
+    "Fixings tight and sealed",
+    "No collateral damage",
+    "Materials used match the job",
+  ],
+  Safety: [
+    "Escape routes clear",
+    "Emergency lighting functional",
+    "Fire equipment in date",
+    "Signage legible and lit",
+  ],
+  "Follow-up": [
+    "Original finding addressed",
+    "No new defects on site",
+    "Evidence recorded",
+  ],
+};
+
+/** A fresh, unjudged checklist for an inspection of this kind. */
+export function inspectionChecksFor(
+  type: InspectionType,
+  inspectionId: string,
+): InspectionCheck[] {
+  return INSPECTION_CHECKLISTS[type].map((label, index) => ({
+    id: `${inspectionId.toLowerCase()}-c${index + 1}`,
+    label,
+    passed: null,
+  }));
+}
+
 export type FsInspection = {
   id: string;
   title: string;
@@ -256,4 +305,29 @@ export function inspectionsAt(propertyId: string) {
   return inspections.filter(
     (inspection) => inspection.propertyId === propertyId,
   );
+}
+
+/** An inspection nobody has signed off yet. */
+export function isPending(inspection: FsInspection) {
+  return inspection.result === "Pending";
+}
+
+/**
+ * The result the checklist adds up to: one failed check fails the round, and it
+ * only passes once every item has been judged.
+ */
+export function resultFor(checklist: InspectionCheck[]): InspectionResult {
+  if (checklist.some((item) => item.passed === false)) return "Failed";
+  if (checklist.length > 0 && checklist.every((item) => item.passed === true))
+    return "Passed";
+  return "Pending";
+}
+
+/** `INS-2044` after `INS-2043`, per property range. */
+export function nextInspectionId(list: FsInspection[]) {
+  const highest = list.reduce((max, inspection) => {
+    const value = Number(inspection.id.replace("INS-", ""));
+    return Number.isNaN(value) ? max : Math.max(max, value);
+  }, 2000);
+  return `INS-${highest + 1}`;
 }

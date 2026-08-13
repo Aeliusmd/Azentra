@@ -157,6 +157,8 @@ export type FsWorkOrder = {
   building: string;
   /** Unit or space within the building. */
   location: string;
+  /** Plant or equipment the job is about, when the supervisor named one. */
+  asset?: string;
   category: FsWorkOrderCategory;
   /** Set on jobs the supervisor raises; seeded jobs carry a category instead. */
   workType?: FsWorkType;
@@ -1248,6 +1250,15 @@ export function isAssignedBucket(order: FsWorkOrder) {
     order.status !== "Completed" &&
     order.status !== "Overdue"
   );
+}
+
+/**
+ * A job the emergency board owns. Critical is the priority an emergency is
+ * raised at, so it stands on its own — a job escalated to critical from the
+ * detail dialog belongs on the board just as much as one raised there.
+ */
+export function isEmergency(order: FsWorkOrder) {
+  return order.priority === "Critical" || order.workType === "Emergency";
 }
 
 export function byProperty(orders: FsWorkOrder[], propertyId: string) {
