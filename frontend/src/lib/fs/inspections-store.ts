@@ -6,7 +6,6 @@ import {
   inspectionChecksFor,
   inspections as seed,
   nextInspectionId,
-  resultFor,
   type FsInspection,
   type InspectionType,
 } from "@/lib/fs/inspections-data";
@@ -53,7 +52,7 @@ export function addInspection(input: NewInspectionInput) {
     date: input.date,
     // The form books the day; the round is walked whenever the morning allows.
     time: "09:00 AM",
-    result: "Pending",
+    status: "Scheduled",
     checklist: inspectionChecksFor(input.type, id),
     findings: "",
     notes: "",
@@ -67,21 +66,37 @@ export function addInspection(input: NewInspectionInput) {
   return id;
 }
 
-/** Judges one check and rolls the round's result up from the whole list. */
+/** Marks one check pass, fail, or back to unmarked. */
 export function setInspectionCheck(
   id: string,
   itemId: string,
   passed: boolean | null,
 ) {
-  list = list.map((inspection) => {
-    if (inspection.id !== id) return inspection;
+  list = list.map((inspection) =>
+    inspection.id === id
+      ? {
+          ...inspection,
+          checklist: inspection.checklist.map((item) =>
+            item.id === itemId ? { ...item, passed } : item,
+          ),
+        }
+      : inspection,
+  );
 
-    const checklist = inspection.checklist.map((item) =>
-      item.id === itemId ? { ...item, passed } : item,
-    );
+  emit();
+}
 
-    return { ...inspection, checklist, result: resultFor(checklist) };
-  });
+/**
+ * Closes the round out. Deliberately not derived from the checklist: a round
+ * can be closed with items left unmarked — not every check applies on the day —
+ * so it is the supervisor who says it is done.
+ */
+export function completeInspection(id: string) {
+  list = list.map((inspection) =>
+    inspection.id === id
+      ? { ...inspection, status: "Completed" as const }
+      : inspection,
+  );
 
   emit();
 }

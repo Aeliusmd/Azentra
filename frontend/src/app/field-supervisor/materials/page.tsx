@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
 
-import { FsSectionPlaceholder } from "@/components/fs/ui/section-placeholder";
+import { FsMaterialsView } from "@/components/fs/materials/materials-view";
 
 export const metadata: Metadata = {
   title: "Materials",
 };
 
 export default function FsMaterialsPage() {
-  return (
-    <FsSectionPlaceholder
-      title="Materials"
-      subtitle="Parts requested for jobs and what is holding work up"
-    />
-  );
+  return <FsMaterialsView />;
 }

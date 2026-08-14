@@ -1,15 +1,21 @@
 "use client";
 
-import { Check, X } from "lucide-react";
+import { Check, Minus, X } from "lucide-react";
 
 import { Pill } from "@/components/pm/ui/pill";
 import { Modal } from "@/components/ui/modal";
 import {
-  RESULT_TONE,
+  checkTally,
+  INSPECTION_STATUS_TONE,
+  isScheduled,
   type FsInspection,
   type InspectionCheck,
 } from "@/lib/fs/inspections-data";
-import { setInspectionCheck } from "@/lib/fs/inspections-store";
+import {
+  completeInspection,
+  setInspectionCheck,
+} from "@/lib/fs/inspections-store";
+import { showFsToast } from "@/lib/fs/toast-store";
 
 const SECTION = "text-[12px] font-semibold tracking-wide text-gray-400 uppercase";
 
@@ -22,7 +28,28 @@ function Detail({ label, value }: { label: string; value: string }) {
   );
 }
 
-/** Pass / fail on one line — clicking the set verdict again clears it. */
+/** Pass, fail, or leave it unmarked — the three verdicts a check can carry. */
+const VERDICTS = [
+  {
+    value: true as const,
+    icon: Check,
+    label: "Pass",
+    on: "border-green-600 text-green-600",
+  },
+  {
+    value: false as const,
+    icon: X,
+    label: "Fail",
+    on: "border-[#e0554d] text-[#e0554d]",
+  },
+  {
+    value: null,
+    icon: Minus,
+    label: "Not checked",
+    on: "border-[#e8a33d] text-[#e8a33d]",
+  },
+];
+
 function CheckRow({
   inspectionId,
   item,
@@ -30,52 +57,43 @@ function CheckRow({
   inspectionId: string;
   item: InspectionCheck;
 }) {
-  function judge(passed: boolean) {
-    setInspectionCheck(inspectionId, item.id, item.passed === passed ? null : passed);
-  }
-
-  const base =
-    "flex h-7 w-7 items-center justify-center rounded-md border transition-colors focus-visible:ring-2 focus-visible:outline-none";
-
   return (
-    <li className="flex items-center justify-between gap-4">
-      <span className="min-w-0 text-[15px] text-gray-600">{item.label}</span>
+    <li className="flex items-center justify-between gap-3 rounded-lg border border-hairline px-3.5 py-2.5">
+      <span className="min-w-0 text-[15px] text-gray-700">{item.label}</span>
 
-      <span className="flex shrink-0 items-center gap-2">
-        <button
-          type="button"
-          onClick={() => judge(true)}
-          aria-pressed={item.passed === true}
-          aria-label={`Pass: ${item.label}`}
-          className={`${base} focus-visible:ring-green-500/40 ${
-            item.passed === true
-              ? "border-green-600 bg-green-600 text-white"
-              : "border-hairline text-gray-400 hover:bg-gray-50"
-          }`}
-        >
-          <Check aria-hidden="true" className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => judge(false)}
-          aria-pressed={item.passed === false}
-          aria-label={`Fail: ${item.label}`}
-          className={`${base} focus-visible:ring-rose-500/40 ${
-            item.passed === false
-              ? "border-[#e0554d] bg-[#e0554d] text-white"
-              : "border-hairline text-gray-400 hover:bg-gray-50"
-          }`}
-        >
-          <X aria-hidden="true" className="h-4 w-4" />
-        </button>
+      <span className="flex shrink-0 items-center gap-1.5">
+        {VERDICTS.map((verdict) => {
+          const selected = item.passed === verdict.value;
+          const Icon = verdict.icon;
+
+          return (
+            <button
+              key={verdict.label}
+              type="button"
+              onClick={() =>
+                setInspectionCheck(inspectionId, item.id, verdict.value)
+              }
+              aria-pressed={selected}
+              aria-label={`${verdict.label}: ${item.label}`}
+              className={`flex h-7 w-7 items-center justify-center rounded-full border transition-colors focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:outline-none ${
+                selected
+                  ? `${verdict.on} bg-white`
+                  : "border-hairline text-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              <Icon aria-hidden="true" className="h-3.5 w-3.5" />
+            </button>
+          );
+        })}
       </span>
     </li>
   );
 }
 
 /**
- * The round in full. The result is never set by hand — it follows the checklist,
- * so a single failed item fails the inspection the moment it is marked.
+ * The round in full. Checks are marked one at a time and the supervisor closes
+ * the round out themselves — an unmarked check is a check that did not apply,
+ * not a round left half done.
  */
 export function InspectionDetailModal({
   inspection,
@@ -84,16 +102,23 @@ export function InspectionDetailModal({
   inspection: FsInspection;
   onClose: () => void;
 }) {
-  const judged = inspection.checklist.filter(
-    (item) => item.passed !== null,
-  ).length;
+  const open = isScheduled(inspection);
+  const tally = checkTally(inspection.checklist);
+
+  function handleComplete() {
+    completeInspection(inspection.id);
+    showFsToast(`${inspection.id} completed`);
+    onClose();
+  }
 
   return (
     <Modal open onClose={onClose} title={`Inspection ${inspection.id}`} size="lg">
       <div className="max-h-[min(70vh,640px)] space-y-6 overflow-y-auto px-5 py-6 sm:px-8">
         <div className="flex flex-wrap items-center gap-3">
-          <Pill tone={RESULT_TONE[inspection.result]}>{inspection.result}</Pill>
-          <Pill tone="navy">{inspection.type}</Pill>
+          <Pill tone={INSPECTION_STATUS_TONE[inspection.status]}>
+            {inspection.status}
+          </Pill>
+          <span className="text-[13px] text-muted">{inspection.type}</span>
         </div>
 
         <div>
@@ -101,21 +126,13 @@ export function InspectionDetailModal({
         </div>
 
         <dl className="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2">
-          <Detail
-            label="Location"
-            value={[inspection.building, inspection.location]
-              .filter(Boolean)
-              .join(" - ")}
-          />
+          <Detail label="Location" value={inspection.location} />
+          <Detail label="Tower" value={inspection.building || "—"} />
           <Detail
             label="Scheduled"
             value={`${inspection.date} ${inspection.time}`}
           />
-          <Detail
-            label="Technician"
-            value={inspection.technician ?? "Unassigned"}
-          />
-          <Detail label="Inspector" value="Carlos Rivera" />
+          <Detail label="Technician" value={inspection.technician ?? "—"} />
           {inspection.workOrderId && (
             <Detail label="Work Order" value={inspection.workOrderId} />
           )}
@@ -124,12 +141,12 @@ export function InspectionDetailModal({
         <section>
           <div className="flex items-center justify-between gap-4">
             <h4 className={SECTION}>Checklist</h4>
-            <span className="text-[13px] font-medium text-muted">
-              {judged}/{inspection.checklist.length} checked
+            <span className="text-[13px] text-muted">
+              {tally.passed} passed · {tally.failed} failed
             </span>
           </div>
 
-          <ul className="mt-3 space-y-3">
+          <ul className="mt-3 space-y-2.5">
             {inspection.checklist.map((item) => (
               <CheckRow
                 key={item.id}
@@ -165,6 +182,18 @@ export function InspectionDetailModal({
           </section>
         )}
       </div>
+
+      {open && (
+        <div className="border-t border-hairline px-5 py-4 sm:px-8 sm:py-5">
+          <button
+            type="button"
+            onClick={handleComplete}
+            className="rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:outline-none"
+          >
+            Complete Inspection
+          </button>
+        </div>
+      )}
     </Modal>
   );
 }

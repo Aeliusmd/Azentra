@@ -32,73 +32,123 @@ export function WeekView({
 }) {
   return (
     <div className="overflow-hidden rounded-lg border border-hairline bg-white">
-      <div className="grid grid-cols-7 border-b border-hairline">
+      {/*
+        Seven columns across a phone leaves about 50px each, which the event
+        cards spill straight out of. Below `md` the week is read as a list of
+        days instead; the grid takes over once there is room for it.
+      */}
+      <ul className="divide-y divide-hairline md:hidden">
         {days.map((iso, index) => {
-          const isToday = iso === today;
-          return (
-            <button
-              key={iso}
-              type="button"
-              onClick={() => onSelectDay(iso)}
-              className={`border-r border-hairline py-3 text-center transition-colors last:border-r-0 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:outline-none ${
-                isToday ? "bg-gray-50" : ""
-              }`}
-            >
-              <span className="block text-[13px] text-muted">
-                {WEEKDAYS[index]}
-              </span>
-              <span
-                className={`mt-0.5 block text-[17px] font-bold ${isToday ? "text-brand" : "text-ink"}`}
-              >
-                {fromIso(iso).getDate()}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="grid grid-cols-7">
-        {days.map((iso) => {
           const dayEvents = eventsOn(events, iso);
+          const isToday = iso === today;
 
           return (
-            <div
-              key={iso}
-              className={`min-h-[340px] space-y-3 border-r border-hairline p-3 last:border-r-0 ${
-                iso === today ? "bg-gray-50/60" : ""
-              }`}
-            >
-              {dayEvents.length === 0 ? (
-                <p className="pt-6 text-center text-[13px] text-gray-400">
-                  No events
-                </p>
-              ) : (
-                dayEvents.map((event) => (
-                  <article
-                    key={event.id}
-                    className={`rounded-lg border p-2.5 ${EVENT_SURFACE[event.type]}`}
-                  >
-                    <h3
-                      className={`text-[13px] leading-snug font-semibold ${EVENT_TITLE[event.type]}`}
-                    >
-                      {event.title}
-                    </h3>
-                    <p className="mt-1 text-[12px] leading-snug text-muted">
-                      {event.time} | {event.location}
-                    </p>
-                    {event.status && (
-                      <p className="mt-2">
-                        <Pill tone={event.statusTone}>{event.status}</Pill>
-                      </p>
-                    )}
-                  </article>
-                ))
+            <li key={iso} className={isToday ? "bg-gray-50/60" : ""}>
+              <button
+                type="button"
+                onClick={() => onSelectDay(iso)}
+                className="flex w-full items-baseline gap-2 px-4 pt-3.5 pb-1 text-left transition-colors hover:bg-gray-50/70 focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:outline-none"
+              >
+                <span
+                  className={`text-[15px] font-bold ${isToday ? "text-brand" : "text-ink"}`}
+                >
+                  {WEEKDAYS[index]} {fromIso(iso).getDate()}
+                </span>
+                <span className="ml-auto text-[13px] text-muted">
+                  {dayEvents.length === 0
+                    ? "No events"
+                    : `${dayEvents.length} event${dayEvents.length === 1 ? "" : "s"}`}
+                </span>
+              </button>
+
+              {dayEvents.length > 0 && (
+                <div className="space-y-2.5 px-4 pt-2 pb-4">
+                  {dayEvents.map((event) => (
+                    <WeekEventCard key={event.id} event={event} />
+                  ))}
+                </div>
               )}
-            </div>
+            </li>
           );
         })}
+      </ul>
+
+      <div className="hidden overflow-x-auto md:block">
+        <div className="min-w-[840px]">
+          <div className="grid grid-cols-7 border-b border-hairline">
+            {days.map((iso, index) => {
+              const isToday = iso === today;
+              return (
+                <button
+                  key={iso}
+                  type="button"
+                  onClick={() => onSelectDay(iso)}
+                  className={`border-r border-hairline py-3 text-center transition-colors last:border-r-0 hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:outline-none ${
+                    isToday ? "bg-gray-50" : ""
+                  }`}
+                >
+                  <span className="block text-[13px] text-muted">
+                    {WEEKDAYS[index]}
+                  </span>
+                  <span
+                    className={`mt-0.5 block text-[17px] font-bold ${isToday ? "text-brand" : "text-ink"}`}
+                  >
+                    {fromIso(iso).getDate()}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="grid grid-cols-7">
+            {days.map((iso) => {
+              const dayEvents = eventsOn(events, iso);
+
+              return (
+                <div
+                  key={iso}
+                  className={`min-h-[340px] space-y-3 border-r border-hairline p-3 last:border-r-0 ${
+                    iso === today ? "bg-gray-50/60" : ""
+                  }`}
+                >
+                  {dayEvents.length === 0 ? (
+                    <p className="pt-6 text-center text-[13px] text-gray-400">
+                      No events
+                    </p>
+                  ) : (
+                    dayEvents.map((event) => (
+                      <WeekEventCard key={event.id} event={event} />
+                    ))
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
+  );
+}
+
+function WeekEventCard({ event }: { event: TechEvent }) {
+  return (
+    <article
+      className={`rounded-lg border p-2.5 ${EVENT_SURFACE[event.type]}`}
+    >
+      <h3
+        className={`text-[13px] leading-snug font-semibold ${EVENT_TITLE[event.type]}`}
+      >
+        {event.title}
+      </h3>
+      <p className="mt-1 text-[12px] leading-snug text-muted">
+        {event.time} | {event.location}
+      </p>
+      {event.status && (
+        <p className="mt-2">
+          <Pill tone={event.statusTone}>{event.status}</Pill>
+        </p>
+      )}
+    </article>
   );
 }
 

@@ -8,8 +8,8 @@ import { InspectionDetailModal } from "@/components/fs/inspections/inspection-de
 import { Pill } from "@/components/pm/ui/pill";
 import { Card } from "@/components/ui/card";
 import {
-  isPending,
-  RESULT_TONE,
+  INSPECTION_STATUS_TONE,
+  isScheduled,
   type FsInspection,
 } from "@/lib/fs/inspections-data";
 import { useFsInspections } from "@/lib/fs/inspections-store";
@@ -34,8 +34,8 @@ function InspectionCard({
           <span className="font-mono text-[13px] text-gray-500">
             {inspection.id}
           </span>
-          <Pill tone={RESULT_TONE[inspection.result]}>
-            {inspection.result}
+          <Pill tone={INSPECTION_STATUS_TONE[inspection.status]}>
+            {inspection.status}
           </Pill>
         </span>
 
@@ -70,8 +70,8 @@ function InspectionCard({
 }
 
 /**
- * Every inspection on this property: the rounds still to sign off first, then
- * the ones already judged, most recent at the top.
+ * Every inspection on this property: the rounds still to walk first, then the
+ * ones already closed out, most recent at the top.
  */
 export function FsInspectionsView() {
   const propertyId = useSelectedFsProperty();
@@ -85,10 +85,10 @@ export function FsInspectionsView() {
       inspections
         .filter((inspection) => inspection.propertyId === propertyId)
         .sort((a, b) => {
-          if (isPending(a) !== isPending(b)) return isPending(a) ? -1 : 1;
+          if (isScheduled(a) !== isScheduled(b)) return isScheduled(a) ? -1 : 1;
 
           const slot = a.date.localeCompare(b.date);
-          return isPending(a) ? slot : -slot;
+          return isScheduled(a) ? slot : -slot;
         }),
     [inspections, propertyId],
   );

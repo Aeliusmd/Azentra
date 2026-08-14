@@ -15,19 +15,17 @@ export const INSPECTION_TYPES = [
 ] as const;
 export type InspectionType = (typeof INSPECTION_TYPES)[number];
 
-export const INSPECTION_RESULTS = [
-  "Pending",
-  "Passed",
-  "Failed",
-  "Follow-up Required",
-] as const;
-export type InspectionResult = (typeof INSPECTION_RESULTS)[number];
+/**
+ * Where the round stands. The verdicts live on the checks themselves — a round
+ * is booked, walked, and then closed out by the supervisor, whatever mix of
+ * passes and fails it turned up.
+ */
+export const INSPECTION_STATUSES = ["Scheduled", "Completed"] as const;
+export type InspectionStatus = (typeof INSPECTION_STATUSES)[number];
 
-export const RESULT_TONE: Record<InspectionResult, PillTone> = {
-  Pending: "navy",
-  Passed: "green",
-  Failed: "red",
-  "Follow-up Required": "orange",
+export const INSPECTION_STATUS_TONE: Record<InspectionStatus, PillTone> = {
+  Scheduled: "green",
+  Completed: "green",
 };
 
 export type InspectionCheck = {
@@ -103,7 +101,7 @@ export type FsInspection = {
   date: string;
   /** 12h `HH:MM AM`. */
   time: string;
-  result: InspectionResult;
+  status: InspectionStatus;
   checklist: InspectionCheck[];
   findings: string;
   notes: string;
@@ -124,7 +122,7 @@ export const inspections: FsInspection[] = [
     technician: "Samuel Oduya",
     date: "2026-08-12",
     time: "09:00 AM",
-    result: "Pending",
+    status: "Scheduled",
     checklist: [
       { id: "c1", label: "Fire extinguishers in date", passed: null },
       { id: "c2", label: "Stairwell signage lit", passed: null },
@@ -148,7 +146,7 @@ export const inspections: FsInspection[] = [
     technician: "Sarah Wilson",
     date: "2026-08-12",
     time: "02:00 PM",
-    result: "Pending",
+    status: "Scheduled",
     checklist: [
       { id: "c5", label: "Treadmill 1 belt tension", passed: null },
       { id: "c6", label: "Treadmill 2 out of service tagged", passed: null },
@@ -171,7 +169,7 @@ export const inspections: FsInspection[] = [
     technician: "Sarah Wilson",
     date: "2026-08-14",
     time: "10:00 AM",
-    result: "Pending",
+    status: "Scheduled",
     checklist: [
       { id: "c8", label: "Water clarity and chemistry", passed: null },
       { id: "c9", label: "Depth markings legible", passed: null },
@@ -195,7 +193,7 @@ export const inspections: FsInspection[] = [
     technician: "Ravi Patel",
     date: "2026-08-12",
     time: "05:30 PM",
-    result: "Pending",
+    status: "Scheduled",
     checklist: [
       { id: "c12", label: "No drip under pressure", passed: null },
       { id: "c13", label: "Fixings tight and sealed", passed: null },
@@ -218,7 +216,7 @@ export const inspections: FsInspection[] = [
     technician: "Ahmed Khan",
     date: "2026-08-11",
     time: "11:30 AM",
-    result: "Passed",
+    status: "Completed",
     checklist: [
       { id: "c15", label: "Airflow measured at outlet", passed: true },
       { id: "c16", label: "Unit mounted square and sealed", passed: true },
@@ -241,7 +239,7 @@ export const inspections: FsInspection[] = [
     technician: "Michael Torres",
     date: "2026-08-10",
     time: "03:00 PM",
-    result: "Failed",
+    status: "Completed",
     checklist: [
       { id: "c18", label: "All six drains flowing", passed: false },
       { id: "c19", label: "No standing water", passed: false },
@@ -266,7 +264,7 @@ export const inspections: FsInspection[] = [
     technician: "Ravi Patel",
     date: "2026-08-10",
     time: "09:30 AM",
-    result: "Passed",
+    status: "Completed",
     checklist: [
       { id: "c21", label: "Ran on load 30 minutes", passed: true },
       { id: "c22", label: "Fuel level above 80%", passed: true },
@@ -289,7 +287,7 @@ export const inspections: FsInspection[] = [
     technician: null,
     date: "2026-08-17",
     time: "10:00 AM",
-    result: "Pending",
+    status: "Scheduled",
     checklist: [
       { id: "c24", label: "All fittings discharge 90 minutes", passed: null },
       { id: "c25", label: "Exit signs illuminated", passed: null },
@@ -307,20 +305,18 @@ export function inspectionsAt(propertyId: string) {
   );
 }
 
-/** An inspection nobody has signed off yet. */
-export function isPending(inspection: FsInspection) {
-  return inspection.result === "Pending";
+/** A round the supervisor still has to walk and close out. */
+export function isScheduled(inspection: FsInspection) {
+  return inspection.status === "Scheduled";
 }
 
-/**
- * The result the checklist adds up to: one failed check fails the round, and it
- * only passes once every item has been judged.
- */
-export function resultFor(checklist: InspectionCheck[]): InspectionResult {
-  if (checklist.some((item) => item.passed === false)) return "Failed";
-  if (checklist.length > 0 && checklist.every((item) => item.passed === true))
-    return "Passed";
-  return "Pending";
+/** Passes and fails marked so far — the summary a closed round carries. */
+export function checkTally(checklist: InspectionCheck[]) {
+  return {
+    passed: checklist.filter((item) => item.passed === true).length,
+    failed: checklist.filter((item) => item.passed === false).length,
+    unmarked: checklist.filter((item) => item.passed === null).length,
+  };
 }
 
 /** `INS-2044` after `INS-2043`, per property range. */

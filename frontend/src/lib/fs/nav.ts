@@ -118,7 +118,6 @@ export const fsNavGroups: FsNavGroup[] = [
       { label: "Calendar", href: `${FS_BASE}/calendar`, icon: CalendarDays },
       { label: "Reports", href: `${FS_BASE}/reports`, icon: ChartColumn },
       { label: "Notifications", href: `${FS_BASE}/notifications`, icon: Bell },
-      { label: "Profile", href: `${FS_BASE}/profile`, icon: UserRound },
       { label: "Settings", href: `${FS_BASE}/settings`, icon: Settings },
     ],
   },
@@ -126,10 +125,23 @@ export const fsNavGroups: FsNavGroup[] = [
 
 const ALL_ITEMS = fsNavGroups.flatMap((group) => group.items);
 
+/**
+ * Pages that are reachable but off the rail — profile is reached from the
+ * avatar menu, and still needs a crumb of its own.
+ */
+const OFF_NAV_LABELS: Record<string, string> = {
+  [`${FS_BASE}/profile`]: "Profile",
+};
+
 /** Trailing breadcrumb crumb for a given path. */
 export function fsNavLabelFor(pathname: string): string {
   const match = ALL_ITEMS.find(
     (item) => pathname === item.href || pathname.startsWith(`${item.href}/`),
   );
-  return match?.label ?? "Dashboard";
+  if (match) return match.label;
+
+  const offNav = Object.entries(OFF_NAV_LABELS).find(
+    ([href]) => pathname === href || pathname.startsWith(`${href}/`),
+  );
+  return offNav?.[1] ?? "Dashboard";
 }
