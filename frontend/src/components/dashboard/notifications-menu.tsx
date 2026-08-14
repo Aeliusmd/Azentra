@@ -50,7 +50,10 @@ export function NotificationsMenu() {
       {open && (
         <div
           aria-label="Notifications"
-          className="absolute top-full right-0 z-40 mt-2 w-[330px] overflow-hidden rounded-xl border border-hairline bg-white shadow-lg"
+          /* Anchoring to the bell would push the panel off the left of a
+             phone — the bell sits well inside the right edge. Below `sm` it
+             hangs under the header across the screen instead. */
+          className="fixed inset-x-4 top-[80px] z-40 overflow-hidden rounded-xl border border-hairline bg-white shadow-lg sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-2 sm:w-[330px]"
         >
           <div className="flex items-center justify-between gap-4 border-b border-hairline px-4 py-3.5">
             <h2 className="text-[15px] font-bold text-ink">Notifications</h2>

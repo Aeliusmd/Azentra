@@ -21,7 +21,7 @@ export function FsModalFooter({
   disabled?: boolean;
 }) {
   return (
-    <div className="flex flex-wrap justify-end gap-3 border-t border-hairline px-8 py-5">
+    <div className="flex flex-wrap justify-end gap-3 border-t border-hairline px-5 py-4 sm:px-8 sm:py-5">
       <button
         type="button"
         onClick={onCancel}

@@ -36,7 +36,7 @@ function Footer({
   disabled?: boolean;
 }) {
   return (
-    <div className="flex justify-end gap-3 border-t border-hairline px-8 py-5">
+    <div className="flex justify-end gap-3 border-t border-hairline px-5 py-4 sm:px-8 sm:py-5">
       <button type="button" onClick={onCancel} className={CANCEL}>
         Cancel
       </button>
@@ -108,7 +108,7 @@ function ReassignModal({
       subtitle={`${order.id} · ${order.title}`}
     >
       <form onSubmit={handleSubmit}>
-        <div className="space-y-5 px-8 py-7">
+        <div className="space-y-5 px-5 py-6 sm:px-8 sm:py-7">
           {!first && (
             <p className="rounded-lg bg-gray-50 px-4 py-3 text-[13px] text-muted">
               Currently with{" "}
@@ -202,7 +202,7 @@ function RescheduleModal({
       subtitle={`${order.id} · ${order.title}`}
     >
       <form onSubmit={handleSubmit}>
-        <div className="space-y-5 px-8 py-7">
+        <div className="space-y-5 px-5 py-6 sm:px-8 sm:py-7">
           {scheduled && (
             <p className="rounded-lg bg-gray-50 px-4 py-3 text-[13px] text-muted">
               Currently booked for{" "}
@@ -354,7 +354,7 @@ function HoldModal({
       subtitle={`${order.id} · ${order.title}`}
     >
       <form onSubmit={handleSubmit}>
-        <div className="space-y-5 px-8 py-7">
+        <div className="space-y-5 px-5 py-6 sm:px-8 sm:py-7">
           <p className="rounded-lg bg-amber-50 px-4 py-3 text-[13px] text-amber-700">
             The job stays with {order.technician ?? "the queue"} and keeps its
             progress — it just stops counting as active work.

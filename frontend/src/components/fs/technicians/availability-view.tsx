@@ -89,7 +89,63 @@ export function FsAvailabilityView() {
       </div>
 
       <Card>
-        <div className="overflow-x-auto">
+        {/* Phones read the roster a person at a time rather than as a grid. */}
+        <ul className="divide-y divide-hairline md:hidden">
+          {roster.map((technician) => (
+            <li key={technician.id} className="px-4 py-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-[13px] font-semibold text-gray-600"
+                  >
+                    {technicianInitials(technician.name)}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[15px] font-semibold text-ink">
+                      {technician.name}
+                    </p>
+                    <p className="mt-0.5 text-[13px] text-muted">
+                      {technician.title}
+                    </p>
+                  </div>
+                </div>
+                <Pill tone={AVAILABILITY_TONE[technician.availability]}>
+                  {technician.availability}
+                </Pill>
+              </div>
+
+              <dl className="mt-3 space-y-1.5">
+                {days.map((offset) => {
+                  const day = technician.roster[offset];
+
+                  return (
+                    <div key={offset} className="flex justify-between gap-3">
+                      <dt
+                        className={`text-[13px] ${offset === 0 ? "font-semibold text-ink" : "text-muted"}`}
+                      >
+                        {dayHeading(offset)}
+                      </dt>
+                      <dd
+                        className={`text-[13px] font-medium ${
+                          isOnDuty(day)
+                            ? "text-green-700"
+                            : day === ON_LEAVE
+                              ? "text-[#c26a2f]"
+                              : "text-gray-400"
+                        }`}
+                      >
+                        {day}
+                      </dd>
+                    </div>
+                  );
+                })}
+              </dl>
+            </li>
+          ))}
+        </ul>
+
+        <div className="relative hidden overflow-x-auto md:block">
           <table className="w-full min-w-[1040px] text-left">
             <thead>
               <tr className="border-b border-hairline">

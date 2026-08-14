@@ -6,6 +6,7 @@ import { ChevronRight, Plus, X } from "lucide-react";
 
 import { FsFilterChips } from "@/components/fs/ui/filter-chips";
 import { FsPagination } from "@/components/fs/ui/pagination";
+import { FsRecordRow } from "@/components/fs/ui/record-row";
 import { CreateWorkOrderModal } from "@/components/fs/work-orders/create-work-order-modal";
 import { WorkOrderDetailModal } from "@/components/fs/work-orders/work-order-detail-modal";
 import { FilterSelect } from "@/components/pm/ui/filter-select";
@@ -243,7 +244,35 @@ export function FsWorkOrdersView() {
       </Card>
 
       <Card>
-        <div className="overflow-x-auto">
+        {/* Phones get the stacked list below; the table needs the width. */}
+        <ul className="divide-y divide-hairline md:hidden">
+          {rows.map((order) => (
+            <FsRecordRow
+              key={order.id}
+              id={order.id}
+              title={order.title}
+              subtitle={locationLabel(order, " - ")}
+              pills={[
+                { tone: WO_PRIORITY_TONE[order.priority], label: order.priority },
+                { tone: WO_STATUS_TONE[order.status], label: order.status },
+              ]}
+              meta={[
+                {
+                  label: "Technician",
+                  value: order.technician ?? "Unassigned",
+                },
+                { label: "Progress", value: `${order.progress}%` },
+                {
+                  label: "Scheduled",
+                  value: order.scheduledDate ?? "Not booked",
+                },
+              ]}
+              onOpen={() => setOpenId(order.id)}
+            />
+          ))}
+        </ul>
+
+        <div className="relative hidden overflow-x-auto md:block">
           <table className="w-full min-w-[1080px] text-left">
             <thead>
               <tr className="border-b border-hairline">

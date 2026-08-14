@@ -96,7 +96,7 @@ export function WorkOrderDetailModal({
         title={`Work Order ${order.id}`}
         size="lg"
       >
-        <div className="max-h-[min(70vh,640px)] space-y-6 overflow-y-auto px-8 py-6">
+        <div className="max-h-[min(70vh,640px)] space-y-6 overflow-y-auto px-5 py-6 sm:px-8">
           <div className="flex flex-wrap items-center gap-3">
             <Pill tone={WO_STATUS_TONE[order.status]}>{order.status}</Pill>
             <Pill tone={WO_PRIORITY_TONE[order.priority]}>
@@ -252,7 +252,7 @@ export function WorkOrderDetailModal({
           )}
         </div>
 
-        <div className="flex flex-wrap gap-3 border-t border-hairline px-8 py-5">
+        <div className="flex flex-wrap gap-3 border-t border-hairline px-5 py-4 sm:px-8 sm:py-5">
           <ActionButton
             icon={UserRoundCheck}
             variant="primary"

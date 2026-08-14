@@ -57,7 +57,7 @@ export function SiteVisitDetailModal({
 
   return (
     <Modal open onClose={onClose} title={`Site Visit ${visit.id}`} size="lg">
-      <div className="max-h-[min(70vh,640px)] space-y-6 overflow-y-auto px-8 py-6">
+      <div className="max-h-[min(70vh,640px)] space-y-6 overflow-y-auto px-5 py-6 sm:px-8">
         <div className="flex flex-wrap items-center gap-3">
           <Pill tone={VISIT_STATUS_TONE[visit.status]}>{visit.status}</Pill>
           <Pill tone="amber">{visit.purpose}</Pill>
@@ -125,7 +125,7 @@ export function SiteVisitDetailModal({
       </div>
 
       {step && (
-        <div className="border-t border-hairline px-8 py-5">
+        <div className="border-t border-hairline px-5 py-4 sm:px-8 sm:py-5">
           <button
             type="button"
             onClick={handleStep}

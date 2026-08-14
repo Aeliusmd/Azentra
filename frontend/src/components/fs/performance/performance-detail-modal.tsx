@@ -38,7 +38,7 @@ export function PerformanceDetailModal({
       title={`${technician.name} — Performance`}
       size="lg"
     >
-      <div className="max-h-[min(70vh,640px)] space-y-6 overflow-y-auto px-8 py-6">
+      <div className="max-h-[min(70vh,640px)] space-y-6 overflow-y-auto px-5 py-6 sm:px-8">
         <div className="flex items-center gap-4">
           <span
             aria-hidden="true"

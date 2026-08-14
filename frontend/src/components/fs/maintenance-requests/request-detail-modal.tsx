@@ -40,7 +40,7 @@ export function RequestDetailModal({
       title={`Request ${request.id}`}
       size="lg"
     >
-      <div className="max-h-[min(70vh,620px)] space-y-6 overflow-y-auto px-8 py-6">
+      <div className="max-h-[min(70vh,620px)] space-y-6 overflow-y-auto px-5 py-6 sm:px-8">
         <div className="flex flex-wrap items-center gap-3">
           <Pill tone={MR_STATUS_TONE[request.status]}>{request.status}</Pill>
           <Pill tone={MR_PRIORITY_TONE[request.priority]}>
@@ -84,7 +84,7 @@ export function RequestDetailModal({
         )}
       </div>
 
-      <div className="flex justify-end border-t border-hairline px-8 py-5">
+      <div className="flex justify-end border-t border-hairline px-5 py-4 sm:px-8 sm:py-5">
         <button
           type="button"
           onClick={onClose}

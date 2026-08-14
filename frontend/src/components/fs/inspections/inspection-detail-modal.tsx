@@ -90,7 +90,7 @@ export function InspectionDetailModal({
 
   return (
     <Modal open onClose={onClose} title={`Inspection ${inspection.id}`} size="lg">
-      <div className="max-h-[min(70vh,640px)] space-y-6 overflow-y-auto px-8 py-6">
+      <div className="max-h-[min(70vh,640px)] space-y-6 overflow-y-auto px-5 py-6 sm:px-8">
         <div className="flex flex-wrap items-center gap-3">
           <Pill tone={RESULT_TONE[inspection.result]}>{inspection.result}</Pill>
           <Pill tone="navy">{inspection.type}</Pill>

@@ -52,7 +52,7 @@ export function WeekView({
   onSelectDay: (iso: string) => void;
 }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="relative overflow-x-auto">
       <div className="grid min-w-[900px] grid-cols-5 divide-x divide-hairline">
         {days.map((iso) => {
           const date = fromIso(iso);
@@ -111,7 +111,7 @@ export function MonthView({
   const weeks = monthGrid(year, month);
 
   return (
-    <div className="overflow-x-auto">
+    <div className="relative overflow-x-auto">
       <div className="min-w-[900px]">
         <div className="grid grid-cols-7 border-b border-hairline">
           {WEEKDAYS.map((day) => (

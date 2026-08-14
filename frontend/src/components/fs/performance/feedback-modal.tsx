@@ -31,7 +31,7 @@ export function FeedbackModal({
   return (
     <Modal open onClose={onClose} title={`Feedback — ${technician.name}`}>
       <form onSubmit={handleSubmit}>
-        <div className="space-y-4 px-8 py-7">
+        <div className="space-y-4 px-5 py-6 sm:px-8 sm:py-7">
           <p className="text-[15px] text-muted">
             Internal management feedback for {technician.name}. Not shared with
             the technician.

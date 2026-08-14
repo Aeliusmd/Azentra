@@ -73,7 +73,7 @@ export function CreateSiteVisitModal({ onClose }: { onClose: () => void }) {
   return (
     <Modal open onClose={onClose} title="Create Site Visit" size="lg">
       <form onSubmit={handleSubmit}>
-        <div className="space-y-5 px-8 py-7">
+        <div className="space-y-5 px-5 py-6 sm:px-8 sm:py-7">
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <SelectField
               id="sv-tower"

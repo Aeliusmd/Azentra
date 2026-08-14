@@ -86,7 +86,7 @@ export function CreateScheduledJobModal({ onClose }: { onClose: () => void }) {
   return (
     <Modal open onClose={onClose} title="Create Scheduled Job" size="lg">
       <form onSubmit={handleSubmit}>
-        <div className="space-y-5 px-8 py-7">
+        <div className="space-y-5 px-5 py-6 sm:px-8 sm:py-7">
           <InputField
             id="csj-title"
             label="Job Title"

@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { CreateScheduledJobModal } from "@/components/fs/job-scheduling/create-scheduled-job-modal";
 import { FsFilterChips } from "@/components/fs/ui/filter-chips";
 import { FsPagination } from "@/components/fs/ui/pagination";
+import { FsRecordRow } from "@/components/fs/ui/record-row";
 import { WorkOrderDetailModal } from "@/components/fs/work-orders/work-order-detail-modal";
 import { FilterSelect } from "@/components/pm/ui/filter-select";
 import { Pill } from "@/components/pm/ui/pill";
@@ -167,7 +168,37 @@ export function FsJobSchedulingView() {
       </Card>
 
       <Card>
-        <div className="overflow-x-auto">
+        {/* Phones get the stacked list below; the table needs the width. */}
+        <ul className="divide-y divide-hairline md:hidden">
+          {rows.map((order) => (
+            <FsRecordRow
+              key={order.id}
+              id={order.id}
+              title={order.title}
+              subtitle={locationLabel(order, " - ")}
+              pills={[
+                { tone: WO_PRIORITY_TONE[order.priority], label: order.priority },
+                { tone: WO_STATUS_TONE[order.status], label: order.status },
+              ]}
+              meta={[
+                { label: "Type", value: jobTypeOf(order) },
+                {
+                  label: "Technician",
+                  value: order.technician ?? "Unassigned",
+                },
+                {
+                  label: "Scheduled",
+                  value: order.scheduledDate
+                    ? `${order.scheduledDate} ${order.scheduledTime}`
+                    : "Not booked",
+                },
+              ]}
+              onOpen={() => setOpenId(order.id)}
+            />
+          ))}
+        </ul>
+
+        <div className="relative hidden overflow-x-auto md:block">
           <table className="w-full min-w-[980px] text-left">
             <thead>
               <tr className="border-b border-hairline">

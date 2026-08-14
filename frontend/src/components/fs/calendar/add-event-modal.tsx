@@ -73,7 +73,7 @@ export function AddEventModal({
   return (
     <Modal open onClose={onClose} title="Add Event">
       <form onSubmit={handleSubmit}>
-        <div className="space-y-5 px-8 py-7">
+        <div className="space-y-5 px-5 py-6 sm:px-8 sm:py-7">
           <InputField
             id="ce-title"
             label="Title"

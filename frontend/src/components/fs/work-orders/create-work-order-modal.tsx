@@ -87,7 +87,7 @@ export function CreateWorkOrderModal({ onClose }: { onClose: () => void }) {
   return (
     <Modal open onClose={onClose} title="Create Work Order" size="lg">
       <form onSubmit={handleSubmit}>
-        <div className="space-y-5 px-8 py-7">
+        <div className="space-y-5 px-5 py-6 sm:px-8 sm:py-7">
           <InputField
             id="cw-title"
             label="Title"

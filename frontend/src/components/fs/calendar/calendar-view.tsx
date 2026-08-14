@@ -23,6 +23,7 @@ import {
   workWeekOf,
   type CalendarEventType,
 } from "@/lib/fs/calendar-data";
+import { useIsPhone } from "@/hooks/use-media-query";
 import { useFsCalendarEvents } from "@/lib/fs/calendar-store";
 import { TODAY } from "@/lib/fs/dashboard-data";
 import { useFsInspections } from "@/lib/fs/inspections-store";
@@ -51,7 +52,11 @@ export function FsCalendarView() {
   const preventive = useFsPreventiveTasks();
   const extras = useFsCalendarEvents();
 
-  const [view, setView] = useState<View>("Week");
+  // A five-day grid does not fit a phone, so the calendar opens on the day
+  // there instead — until the supervisor picks a view for themselves.
+  const phone = useIsPhone();
+  const [chosenView, setView] = useState<View | null>(null);
+  const view = chosenView ?? (phone ? "Day" : "Week");
   /** The day the calendar is sitting on — drives every view. */
   const [cursor, setCursor] = useState(TODAY);
   const [addOpen, setAddOpen] = useState(false);

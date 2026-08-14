@@ -61,7 +61,7 @@ export function PmTaskModal({
       size="lg"
     >
       <form onSubmit={handleComplete}>
-        <div className="max-h-[min(70vh,640px)] space-y-6 overflow-y-auto px-8 py-6">
+        <div className="max-h-[min(70vh,640px)] space-y-6 overflow-y-auto px-5 py-6 sm:px-8">
           <div className="flex flex-wrap items-center gap-3">
             <Pill tone={PM_STATUS_TONE[status]}>{status}</Pill>
             <span className="text-[13px] text-muted">

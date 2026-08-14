@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { RequestDetailModal } from "@/components/fs/maintenance-requests/request-detail-modal";
 import { FsFilterChips } from "@/components/fs/ui/filter-chips";
+import { FsRecordRow } from "@/components/fs/ui/record-row";
 import { Pill } from "@/components/pm/ui/pill";
 import { Card } from "@/components/ui/card";
 import {
@@ -68,7 +69,35 @@ export function FsMaintenanceRequestsView() {
       </div>
 
       <Card>
-        <div className="overflow-x-auto">
+        {/* Phones get the stacked list below; the table needs the width. */}
+        <ul className="divide-y divide-hairline md:hidden">
+          {visible.map((request) => (
+            <FsRecordRow
+              key={request.id}
+              id={request.id}
+              title={request.title}
+              subtitle={`${request.unit} · ${request.resident}`}
+              pills={[
+                {
+                  tone: MR_PRIORITY_TONE[request.priority],
+                  label: request.priority,
+                },
+                { tone: MR_STATUS_TONE[request.status], label: request.status },
+              ]}
+              meta={[
+                {
+                  label: "Technician",
+                  value: request.technician ?? "Unassigned",
+                },
+                { label: "Age", value: ageLabel(request.submittedAt) },
+                { label: "Due", value: request.dueDate },
+              ]}
+              onOpen={() => setOpenId(request.id)}
+            />
+          ))}
+        </ul>
+
+        <div className="relative hidden overflow-x-auto md:block">
           <table className="w-full min-w-[1000px] text-left">
             <thead>
               <tr className="border-b border-hairline">

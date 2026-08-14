@@ -49,7 +49,7 @@ export function CreateInspectionModal({ onClose }: { onClose: () => void }) {
   return (
     <Modal open onClose={onClose} title="Create Inspection">
       <form onSubmit={handleSubmit}>
-        <div className="space-y-5 px-8 py-7">
+        <div className="space-y-5 px-5 py-6 sm:px-8 sm:py-7">
           <SelectField
             id="ci-type"
             label="Type"

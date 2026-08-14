@@ -57,7 +57,7 @@ export function EmergencyWorkOrderModal({ onClose }: { onClose: () => void }) {
   return (
     <Modal open onClose={onClose} title="Create Emergency Work Order" size="lg">
       <form onSubmit={handleSubmit}>
-        <div className="space-y-5 px-8 py-7">
+        <div className="space-y-5 px-5 py-6 sm:px-8 sm:py-7">
           <p className="flex items-start gap-3 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3.5 text-[13px] text-rose-700">
             <Siren aria-hidden="true" className="mt-px h-4 w-4 shrink-0" />
             <span>

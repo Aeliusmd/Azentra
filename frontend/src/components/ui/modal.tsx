@@ -91,7 +91,7 @@ export function Modal({
         aria-labelledby={titleId}
         className={`my-auto w-full overflow-hidden rounded-2xl bg-white shadow-xl ${SIZES[size]}`}
       >
-        <div className="flex items-center justify-between gap-4 border-b border-hairline px-8 py-6">
+        <div className="flex items-center justify-between gap-4 border-b border-hairline px-5 py-5 sm:px-8 sm:py-6">
           <div className="min-w-0">
             <h2 id={titleId} className="text-[22px] font-bold text-ink">
               {title}
