@@ -49,6 +49,30 @@ export const KIND_CHIP: Record<FsNotificationKind, string> = {
   Schedule: "bg-[#eef3f9] text-[#2e6cad]",
 };
 
+/**
+ * How loudly a notification reads, independent of what it is about: the same
+ * kind can be either good or bad news — a technician accepting a job and one
+ * calling in sick are both `Technician`.
+ */
+export const FS_SEVERITIES = [
+  "emergency",
+  "warning",
+  "info",
+  "success",
+] as const;
+export type FsSeverity = (typeof FS_SEVERITIES)[number];
+
+/** Where a pushed notification lands when it does not state its own severity. */
+export const KIND_SEVERITY: Record<FsNotificationKind, FsSeverity> = {
+  Emergency: "emergency",
+  Overdue: "warning",
+  Parts: "warning",
+  Schedule: "warning",
+  "Work Order": "info",
+  Inspection: "info",
+  Technician: "success",
+};
+
 export type FsNotification = {
   id: string;
   title: string;
@@ -56,6 +80,7 @@ export type FsNotification = {
   /** Relative label, e.g. "15 min ago". */
   time: string;
   kind: FsNotificationKind;
+  severity: FsSeverity;
   read: boolean;
 };
 
@@ -67,6 +92,7 @@ const seed: FsNotification[] = [
       "Fire alarm panel fault in Tower B (WO-1053). No technician assigned yet.",
     time: "15 min ago",
     kind: "Emergency",
+    severity: "emergency",
     read: false,
   },
   {
@@ -75,6 +101,7 @@ const seed: FsNotification[] = [
     detail: "Kitchen sink clogged in Unit A-102 (WO-1054) needs assignment.",
     time: "40 min ago",
     kind: "Work Order",
+    severity: "info",
     read: false,
   },
   {
@@ -83,6 +110,7 @@ const seed: FsNotification[] = [
     detail: "Ravi Patel started the parking gate sensor repair (WO-1045).",
     time: "1 hr ago",
     kind: "Technician",
+    severity: "success",
     read: false,
   },
   {
@@ -92,6 +120,7 @@ const seed: FsNotification[] = [
       "Gym treadmill belt (WO-1051) is on back order — supplier ETA 15 Aug.",
     time: "2 hrs ago",
     kind: "Parts",
+    severity: "warning",
     read: false,
   },
   {
@@ -100,6 +129,7 @@ const seed: FsNotification[] = [
     detail: "Roof drain cleaning (WO-1035) passed its due date on 10 Aug.",
     time: "3 hrs ago",
     kind: "Overdue",
+    severity: "warning",
     read: false,
   },
   {
@@ -109,6 +139,7 @@ const seed: FsNotification[] = [
       "Kitchen tap replacement (WO-1052) is awaiting your sign-off inspection.",
     time: "5 hrs ago",
     kind: "Inspection",
+    severity: "info",
     read: true,
   },
   {
@@ -117,6 +148,7 @@ const seed: FsNotification[] = [
     detail: "John Perera accepted the water heater replacement (WO-1048).",
     time: "Yesterday",
     kind: "Technician",
+    severity: "success",
     read: true,
   },
   {
@@ -126,6 +158,7 @@ const seed: FsNotification[] = [
       "Michael Torres has two jobs booked at 09:00 AM on 13 Aug (WO-1049, WO-1035).",
     time: "Yesterday",
     kind: "Schedule",
+    severity: "warning",
     read: true,
   },
   {
@@ -134,6 +167,7 @@ const seed: FsNotification[] = [
     detail: "Omar Haddad is on leave until 15 Aug — HVAC cover needed.",
     time: "2 days ago",
     kind: "Technician",
+    severity: "warning",
     read: true,
   },
   {
@@ -142,6 +176,7 @@ const seed: FsNotification[] = [
     detail: "Ahmed Khan completed the chiller filter cleaning (WO-1039).",
     time: "4 days ago",
     kind: "Work Order",
+    severity: "success",
     read: true,
   },
 ];
@@ -160,9 +195,16 @@ export function pushFsNotification(entry: {
   title: string;
   detail: string;
   kind: FsNotificationKind;
+  severity?: FsSeverity;
 }) {
   items = [
-    { ...entry, id: `fn-new-${++pushedId}`, time: "Just now", read: false },
+    {
+      ...entry,
+      severity: entry.severity ?? KIND_SEVERITY[entry.kind],
+      id: `fn-new-${++pushedId}`,
+      time: "Just now",
+      read: false,
+    },
     ...items,
   ];
   emit();

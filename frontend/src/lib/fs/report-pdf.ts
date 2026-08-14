@@ -21,7 +21,7 @@ const CONTENT_WIDTH = PAGE_WIDTH - MARGIN * 2;
 /** Helvetica averages a little under half its point size per character. */
 const CHAR_WIDTH_RATIO = 0.5;
 
-type Line = {
+export type PdfLine = {
   text: string;
   size: number;
   bold?: boolean;
@@ -48,7 +48,7 @@ function escapeText(value: string) {
 }
 
 /** Greedy wrap at the page width for a given point size. */
-function wrap(text: string, size: number): string[] {
+export function wrapText(text: string, size: number): string[] {
   const limit = Math.floor(CONTENT_WIDTH / (size * CHAR_WIDTH_RATIO));
   const lines: string[] = [];
   let current = "";
@@ -68,7 +68,7 @@ function wrap(text: string, size: number): string[] {
 }
 
 /** Positions every line down the page and returns the drawing instructions. */
-function contentStream(lines: Line[]) {
+function contentStream(lines: PdfLine[]) {
   const parts: string[] = ["BT"];
   let y = PAGE_HEIGHT - MARGIN;
 
@@ -86,7 +86,7 @@ function contentStream(lines: Line[]) {
 }
 
 /** Assembles the objects, the cross-reference table and the trailer. */
-function buildPdf(lines: Line[]) {
+function buildPdf(lines: PdfLine[]) {
   const stream = contentStream(lines);
 
   const objects = [
@@ -120,7 +120,7 @@ function buildPdf(lines: Line[]) {
 }
 
 /** The report as page copy, shared by the PDF and the print sheet. */
-function reportLines(report: FsFieldReport): Line[] {
+function reportLines(report: FsFieldReport): PdfLine[] {
   return [
     { text: "Azentra", size: 10, bold: true },
     { text: `${report.id} - ${report.type}`, size: 20, bold: true, gap: 18 },
@@ -130,25 +130,30 @@ function reportLines(report: FsFieldReport): Line[] {
     { text: `Author: ${report.author}`, size: 11, gap: 4 },
     { text: `Status: ${report.status}`, size: 11, gap: 4 },
     { text: "Summary", size: 13, bold: true, gap: 24 },
-    ...wrap(report.summary, 11).map((text) => ({ text, size: 11, gap: 4 })),
+    ...wrapText(report.summary, 11).map((text) => ({ text, size: 11, gap: 4 })),
   ];
 }
 
-export function downloadReportPdf(report: FsFieldReport) {
-  const blob = new Blob([buildPdf(reportLines(report))], {
+/** Writes the lines to a PDF and hands it to the browser as a download. */
+export function downloadPdf(filename: string, lines: PdfLine[]) {
+  const blob = new Blob([buildPdf(lines)], {
     type: "application/pdf",
   });
   const url = URL.createObjectURL(blob);
 
   const link = document.createElement("a");
   link.href = url;
-  link.download = `${report.id}.pdf`;
+  link.download = filename;
   document.body.append(link);
   link.click();
   link.remove();
 
   // Released on the next tick so the download has taken the handle.
   setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+export function downloadReportPdf(report: FsFieldReport) {
+  downloadPdf(`${report.id}.pdf`, reportLines(report));
 }
 
 function escapeHtml(value: string) {
