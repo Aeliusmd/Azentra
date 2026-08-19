@@ -17,6 +17,15 @@ export const PAYMENT_METHODS = [
 ] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
+/** Chip order on the payment-history filter row. */
+export const PAYMENT_METHOD_FILTERS = [
+  "All",
+  "Online",
+  "Bank Transfer",
+  "Cash",
+  "Card",
+] as const;
+
 export const PAYMENT_STATUSES = [
   "Pending",
   "Verified",
@@ -65,11 +74,11 @@ type Row = [
 
 const OPEN_MONTH: Record<string, Row[]> = {
   sunrise: [
-    [1, "Sarah Johnson", "B-205", 25_200, "Online", 5, "TXN-88201", "Verified"],
+    [1, "Sarah Johnson", "B-205", 25_200, "Online", 5, "TXN-88231", "Verified"],
     [6, "David Lee", "C-102", 23_600, "Bank Transfer", 6, "TXN-88245", "Verified"],
-    [9, "Tom Harris", "A-501", 25_700, "Card", 7, "TXN-88278", "Verified"],
+    [9, "Tom Harris", "A-501", 25_700, "Card", 7, "TXN-88267", "Verified"],
     // Short of the 26,500 bill — which is why C-305 reads Partially Paid.
-    [3, "Robert Taylor", "C-305", 15_000, "Bank Transfer", 8, "TXN-88296", "Verified"],
+    [3, "Robert Taylor", "C-305", 15_000, "Bank Transfer", 8, "TXN-88301", "Verified"],
     // Not yet cleared, so A-101 is still Overdue against its 28,200.
     [2, "Emily Watson", "A-101", 20_000, "Cash", 10, "TXN-88322", "Pending"],
     [5, "Mike Peterson", "A-205", 23_300, "Online", 11, "TXN-88340", "Pending"],
@@ -162,4 +171,36 @@ export function paidAgainstBill(bill: UnitBill, payments: AccPayment[]) {
   if (bill.status === "Paid") return bill.total;
   if (bill.status === "Partially Paid") return Math.round(bill.total * 0.4);
   return 0;
+}
+
+/**
+ * The receipt issued for a payment.
+ *
+ * Numbered off the bill it settles rather than off the payment, so a resident
+ * can match the receipt to the bill in front of them. A part payment is
+ * suffixed `-P`: the bill is not closed by it, and more receipts will follow
+ * against the same number.
+ */
+export function receiptNumberFor(payment: AccPayment, bills: UnitBill[]) {
+  const [year] = payment.period.split("-");
+  const tail = (payment.bill.split("-").pop() ?? "").slice(-4);
+  const bill = bills.find((entry) => entry.id === payment.bill);
+  const partial = bill !== undefined && payment.amount < bill.total;
+
+  return `RCP-${year}-${tail}${partial ? "-P" : ""}`;
+}
+
+/**
+ * Whether a receipt has actually been issued for a payment.
+ *
+ * Two things have to be true: the payment closes its bill — a part payment
+ * leaves the bill open, so there is nothing to receipt yet — and the bill was
+ * issued in the first place. A draft has not been sent to anyone, so money
+ * against it cannot be receipted until it is.
+ */
+export function isReceipted(payment: AccPayment, bills: UnitBill[]) {
+  const bill = bills.find((entry) => entry.id === payment.bill);
+  if (!bill) return false;
+
+  return payment.amount >= bill.total && bill.status !== "Draft";
 }

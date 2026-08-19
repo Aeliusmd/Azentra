@@ -23,10 +23,22 @@ export function grouped(value: number) {
  * `4250000` → `LKR 4250K` — the summary-tile form.
  *
  * Ungrouped on purpose: `LKR 4,250K` reads as two separators fighting over the
- * same number, and the tiles are for scale rather than reconciliation.
+ * same number, and the tiles are for scale rather than reconciliation. Pass
+ * `decimals` where whole thousands would round away the point of the figure —
+ * an average payment of 23,757 is `LKR 23.8K`, not `LKR 24K`.
  */
-export function lkrK(amount: number) {
-  return `LKR ${Math.round(amount / 1000)}K`;
+export function lkrK(amount: number, decimals = 0) {
+  return `LKR ${(amount / 1000).toFixed(decimals)}K`;
+}
+
+/**
+ * `2997500` → `LKR 3.0M` — for totals where thousands stop being readable.
+ *
+ * A decimal by default: rounding 2,997,500 to a whole `LKR 3M` hides that it is
+ * not actually three million.
+ */
+export function lkrM(amount: number, decimals = 1) {
+  return `LKR ${(amount / 1_000_000).toFixed(decimals)}M`;
 }
 
 /** `4250000` → `4250K`, for chart axes that carry the currency in the title. */

@@ -1,4 +1,6 @@
+import type { ExpenseStatus } from "@/lib/acc/expenses-data";
 import type { PaymentStatus } from "@/lib/acc/payments-data";
+import type { RecurringStatus } from "@/lib/acc/recurring-expenses-data";
 import type { InvoiceStatus } from "@/lib/acc/resident-invoices-data";
 import type { ReadingStatus } from "@/lib/acc/utility-bills-data";
 import type { BillStatus } from "@/lib/acc/unit-bills-data";
@@ -85,4 +87,25 @@ const PAYMENT_TONE: Record<PaymentStatus, StatusTone> = {
 
 export function PaymentStatusPill({ status }: { status: PaymentStatus }) {
   return <StatusPill tone={PAYMENT_TONE[status]}>{status}</StatusPill>;
+}
+
+/** A cost is logged, signed off, then settled. */
+const EXPENSE_TONE: Record<ExpenseStatus, StatusTone> = {
+  Pending: "amber",
+  Approved: "indigo",
+  Paid: "green",
+};
+
+export function ExpenseStatusPill({ status }: { status: ExpenseStatus }) {
+  return <StatusPill tone={EXPENSE_TONE[status]}>{status}</StatusPill>;
+}
+
+/** A standing cost is either running or stopped. */
+const RECURRING_TONE: Record<RecurringStatus, StatusTone> = {
+  Active: "green",
+  Paused: "steel",
+};
+
+export function RecurringStatusPill({ status }: { status: RecurringStatus }) {
+  return <StatusPill tone={RECURRING_TONE[status]}>{status}</StatusPill>;
 }
