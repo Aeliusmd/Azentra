@@ -64,6 +64,13 @@ const ALLOCATIONS: Record<string, Row[]> = {
  */
 export type BudgetPressure = "on-track" | "near-limit" | "over";
 
+/** Bar colour per pressure band, shared by every screen that draws one. */
+export const PRESSURE_BAR: Record<BudgetPressure, string> = {
+  "on-track": "#3f9e63",
+  "near-limit": "#e8a33d",
+  over: "#e0554d",
+};
+
 export function pressureOf(used: number): BudgetPressure {
   if (used >= 100) return "over";
   if (used > 75) return "near-limit";

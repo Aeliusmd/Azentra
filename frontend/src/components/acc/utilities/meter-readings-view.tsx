@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Upload } from "lucide-react";
 
-import { UtilityReadingModal } from "@/components/acc/billing/utility-reading-modal";
 import { AccRecordRow } from "@/components/acc/ui/record-row";
 import { AccStatusChips } from "@/components/acc/ui/status-chips";
 import { ReadingStatusPill } from "@/components/acc/ui/status-pill";
+import { BulkEntryModal } from "@/components/acc/utilities/bulk-entry-modal";
 import { FsPagination } from "@/components/fs/ui/pagination";
 import { Card } from "@/components/ui/card";
 import { grouped, lkr } from "@/lib/acc/money";
@@ -18,11 +19,11 @@ import { useAccUtilityReadings } from "@/lib/acc/utility-readings-store";
 const HEADINGS: { label: string; numeric?: boolean }[] = [
   { label: "Unit" },
   { label: "Type" },
-  { label: "Prev Reading", numeric: true },
-  { label: "Curr Reading", numeric: true },
+  { label: "Previous", numeric: true },
+  { label: "Current", numeric: true },
   { label: "Consumption", numeric: true },
-  { label: "Rate", numeric: true },
   { label: "Charge", numeric: true },
+  { label: "Date" },
   { label: "Status" },
 ];
 
@@ -30,14 +31,19 @@ const PAGE_SIZE = 10;
 
 const CELL = "px-5 py-3.5 text-[14px] whitespace-nowrap";
 
-export function AccUtilityBillsView() {
+/**
+ * The meter round for the cycle — the readings themselves, before they become
+ * charges on a bill. Same records the Utility Bills page charges from, so one
+ * corrected here moves the money there.
+ */
+export function AccMeterReadingsView() {
   const allReadings = useAccUtilityReadings();
   const propertyId = useSelectedAccProperty();
   const period = useSelectedAccPeriod();
 
   const [type, setType] = useState<string>("All");
   const [page, setPage] = useState(1);
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [bulkOpen, setBulkOpen] = useState(false);
 
   const readings = useMemo(
     () =>
@@ -60,17 +66,27 @@ export function AccUtilityBillsView() {
   const current = Math.min(page, pageCount);
   const rows = visible.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
 
-  const openReading = readings.find((reading) => reading.id === openId) ?? null;
-
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-[28px] leading-tight font-bold text-ink">
-          Utility Bills
-        </h1>
-        <p className="mt-1 text-[14px] text-muted">
-          Utility consumption and billing per unit
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-[28px] leading-tight font-bold text-ink">
+            Meter Readings
+          </h1>
+          <p className="mt-1 text-[14px] text-muted">
+            Record and verify utility meter readings
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setBulkOpen(true)}
+          aria-haspopup="dialog"
+          className="flex items-center gap-2 rounded-lg border border-hairline bg-white px-5 py-2.5 text-[15px] font-semibold text-ink transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:outline-none"
+        >
+          <Upload aria-hidden="true" className="h-[18px] w-[18px]" />
+          Bulk Entry
+        </button>
       </div>
 
       <AccStatusChips
@@ -94,19 +110,21 @@ export function AccUtilityBillsView() {
               status={<ReadingStatusPill status={reading.status} />}
               meta={[
                 {
-                  label: "Consumption",
-                  value: `${grouped(reading.consumption)} units`,
+                  label: "Reading",
+                  value: `${grouped(reading.previous)} → ${grouped(reading.current)}`,
                 },
-                { label: "Rate", value: `LKR ${reading.rate}/unit` },
+                {
+                  label: "Consumption",
+                  value: `${grouped(reading.consumption)} u`,
+                },
                 { label: "Charge", value: lkr(reading.charge) },
               ]}
-              onOpen={() => setOpenId(reading.id)}
             />
           ))}
         </ul>
 
         <div className="hidden overflow-x-auto md:block">
-          <table className="w-full min-w-[980px] text-left">
+          <table className="w-full min-w-[1040px] text-left">
             <thead>
               <tr className="border-b border-hairline">
                 {HEADINGS.map((heading) => (
@@ -127,8 +145,7 @@ export function AccUtilityBillsView() {
               {rows.map((reading) => (
                 <tr
                   key={reading.id}
-                  onClick={() => setOpenId(reading.id)}
-                  className="cursor-pointer transition-colors hover:bg-gray-50/70"
+                  className="transition-colors hover:bg-gray-50/70"
                 >
                   <th
                     scope="row"
@@ -144,14 +161,12 @@ export function AccUtilityBillsView() {
                     {grouped(reading.current)}
                   </td>
                   <td className={`${CELL} text-right font-bold text-ink`}>
-                    {grouped(reading.consumption)} units
-                  </td>
-                  <td className={`${CELL} text-right text-muted`}>
-                    LKR {reading.rate}/unit
+                    {grouped(reading.consumption)} u
                   </td>
                   <td className={`${CELL} text-right font-bold text-ink`}>
                     {lkr(reading.charge)}
                   </td>
+                  <td className={`${CELL} text-muted`}>{reading.date}</td>
                   <td className="px-5 py-3.5">
                     <ReadingStatusPill status={reading.status} />
                   </td>
@@ -163,7 +178,7 @@ export function AccUtilityBillsView() {
 
         {visible.length === 0 ? (
           <p className="px-6 py-16 text-center text-[15px] text-muted">
-            No readings recorded for this utility.
+            No readings taken for this utility.
           </p>
         ) : (
           <FsPagination
@@ -177,10 +192,11 @@ export function AccUtilityBillsView() {
         )}
       </Card>
 
-      {openReading && (
-        <UtilityReadingModal
-          reading={openReading}
-          onClose={() => setOpenId(null)}
+      {bulkOpen && (
+        <BulkEntryModal
+          propertyId={propertyId}
+          period={period}
+          onClose={() => setBulkOpen(false)}
         />
       )}
     </div>

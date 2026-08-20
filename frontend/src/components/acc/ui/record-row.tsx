@@ -13,6 +13,7 @@ export function AccRecordRow({
   subtitle,
   status,
   meta = [],
+  action,
   onOpen,
 }: {
   /** Record reference, shown small alongside the title. */
@@ -23,6 +24,11 @@ export function AccRecordRow({
   status?: React.ReactNode;
   /** `label: value` pairs shown under the status. */
   meta?: { label: string; value: string }[];
+  /**
+   * Row action, placed outside the tappable body — a button nested inside the
+   * body's button would be invalid markup and unreachable by keyboard.
+   */
+  action?: React.ReactNode;
   onOpen?: () => void;
 }) {
   const body = (
@@ -74,6 +80,8 @@ export function AccRecordRow({
       ) : (
         <div className="flex flex-col px-4 py-4">{body}</div>
       )}
+
+      {action && <div className="px-4 pb-4">{action}</div>}
     </li>
   );
 }

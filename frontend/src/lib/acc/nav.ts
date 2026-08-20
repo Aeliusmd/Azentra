@@ -188,11 +188,11 @@ export const accNavGroups: AccNavGroup[] = [
         href: `${ACC_BASE}/vendor-accounts`,
         icon: Banknote,
       },
-      // Same destination as the entry under Invoices — vendor billing is
-      // reached from either side of the ledger.
+      // Distinct from the entry under Invoices: that one is the invoice
+      // record, this one is the approve-and-pay worklist.
       {
         label: "Vendor Invoices",
-        href: `${ACC_BASE}/vendor-invoices`,
+        href: `${ACC_BASE}/vendor-payments`,
         icon: ReceiptText,
       },
     ],

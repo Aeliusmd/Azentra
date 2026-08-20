@@ -41,6 +41,11 @@ export function lkrM(amount: number, decimals = 1) {
   return `LKR ${(amount / 1_000_000).toFixed(decimals)}M`;
 }
 
+/** `5000000` → `5.0M`, for the back half of a `spent / budget` pair. */
+export function shortM(amount: number, decimals = 1) {
+  return `${(amount / 1_000_000).toFixed(decimals)}M`;
+}
+
 /** `4250000` → `4250K`, for chart axes that carry the currency in the title. */
 export function shortK(amount: number) {
   return `${Math.round(amount / 1000)}K`;

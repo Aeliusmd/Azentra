@@ -32,6 +32,8 @@ export type UtilityReading = {
   type: UtilityType;
   /** `2026-08`, matching the billing-period ids. */
   period: string;
+  /** ISO day the meter was read — the cycle opens with a reading round. */
+  date: string;
   previous: number;
   current: number;
   /** `current - previous`. */
@@ -62,16 +64,6 @@ const OPEN_MONTH: Record<string, Row[]> = {
     ["A-304", "Water", 11_200, 11_480, "Pending"],
     ["A-304", "Electricity", 41_000, 41_650, "Pending"],
     ["C-305", "Water", 7_800, 8_050, "Pending"],
-    ["C-305", "Electricity", 36_400, 37_010, "Pending"],
-    ["B-302", "Water", 10_300, 10_590, "Verified"],
-    ["B-302", "Electricity", 43_800, 44_520, "Verified"],
-    ["B-302", "Gas", 4_700, 4_860, "Verified"],
-    ["A-205", "Water", 9_600, 9_870, "Verified"],
-    ["A-205", "Electricity", 39_500, 40_100, "Verified"],
-    ["C-102", "Water", 8_100, 8_360, "Billed"],
-    ["C-102", "Electricity", 37_200, 37_810, "Billed"],
-    ["A-501", "Water", 10_800, 11_070, "Billed"],
-    ["A-501", "Electricity", 42_300, 42_950, "Billed"],
   ],
   "ocean-view": [
     ["1-304", "Water", 9_400, 9_660, "Verified"],
@@ -149,6 +141,7 @@ function build(propertyId: string, period: string): UtilityReading[] {
       unit,
       type,
       period,
+      date: `${period}-01`,
       previous,
       current,
       consumption,
@@ -163,4 +156,11 @@ function build(propertyId: string, period: string): UtilityReading[] {
 /** Every metered reading for one property in one billing period. */
 export function utilityReadingsFor(propertyId: string, period: string) {
   return build(propertyId, period);
+}
+
+/** Every seeded reading, across all properties and every period on file. */
+export function seedUtilityReadings(periods: string[]): UtilityReading[] {
+  return Object.keys(OPEN_MONTH).flatMap((propertyId) =>
+    periods.flatMap((period) => build(propertyId, period)),
+  );
 }

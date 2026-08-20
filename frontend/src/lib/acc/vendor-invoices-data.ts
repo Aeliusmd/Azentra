@@ -79,11 +79,11 @@ type Row = [
 const OPEN_MONTH: Record<string, Row[]> = {
   sunrise: [
     ["ABC Plumbing", "Maintenance", "Emergency Pipe Repair", "WO-1045", 125_000, 10, 25, "Pending Approval"],
-    ["CleanPro Services", "Cleaning", "Monthly Cleaning - {month}", "WO-1047", 250_000, 5, 18, "Approved"],
-    ["ElevatorPro Ltd", "Maintenance", "Elevator Quarterly Maintenance", "WO-1050", 180_000, 8, 22, "Paid"],
-    ["AquaClean Pool Services", "Maintenance", "Pool Maintenance - {month}", "WO-1052", 85_000, 12, 28, "Pending Approval"],
+    ["CleanPro Services", "Cleaning", "Monthly Cleaning - {month}", "WO-1047", 250_000, 5, 20, "Approved"],
+    ["ElevatorPro Ltd", "Maintenance", "Elevator Quarterly Maintenance", "WO-1050", 180_000, 8, 28, "Paid"],
+    ["AquaClean Pool Services", "Maintenance", "Pool Maintenance - {month}", "WO-1052", 85_000, 12, 27, "Pending Approval"],
     ["GreenScape Ltd", "Landscaping", "Landscaping - {month}", "WO-1054", 120_000, 3, 18, "Paid"],
-    ["SecureTech Solutions", "Security", "Security System Maintenance", "WO-1058", 95_000, 6, 20, "Approved"],
+    ["SecureTech Solutions", "Security", "Security System Maintenance", "WO-1058", 95_000, 6, 22, "Approved"],
   ],
   "ocean-view": [
     ["AquaFlow Plumbing", "Maintenance", "Block 2 Pipe Replacement", "WO-2031", 157_627, 9, 20, "Approved"],

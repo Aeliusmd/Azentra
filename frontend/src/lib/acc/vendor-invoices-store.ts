@@ -40,6 +40,28 @@ export function approveVendorInvoice(id: string) {
   );
 }
 
+/**
+ * Settles an approved invoice. Only an approved one can be paid — the sign-off
+ * is the control step, and paying around it would defeat the point of having
+ * one.
+ */
+export function payVendorInvoice(id: string) {
+  const invoice = invoices.find((entry) => entry.id === id);
+  if (!invoice || invoice.status !== "Approved") return;
+
+  invoices = invoices.map((entry) =>
+    entry.id === id ? { ...entry, status: "Paid" } : entry,
+  );
+  listeners.forEach((listener) => listener());
+
+  pushAccNotification(
+    "Payment",
+    "Vendor Invoice Paid",
+    `${invoice.id} · ${invoice.vendor} · ${lkr(invoice.total)} settled.`,
+    "success",
+  );
+}
+
 function subscribe(listener: () => void) {
   listeners.add(listener);
   return () => listeners.delete(listener);
