@@ -2,7 +2,9 @@
 
 export const controlBase =
   "w-full rounded-md border bg-white text-sm text-ink placeholder:text-gray-400 " +
-  "outline-none transition-colors focus:ring-2 disabled:cursor-not-allowed disabled:bg-gray-50";
+  "outline-none transition-colors focus:ring-2 disabled:cursor-not-allowed disabled:bg-gray-50 " +
+  // A field the office owns reads as one, rather than looking editable.
+  "read-only:text-muted";
 
 export const controlIdle =
   "border-hairline focus:border-brand focus:ring-brand/20";

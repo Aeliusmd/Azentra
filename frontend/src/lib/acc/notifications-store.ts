@@ -2,15 +2,17 @@
 
 import { useSyncExternalStore } from "react";
 import {
-  Banknote,
   CalendarClock,
+  CircleAlert,
+  CircleDollarSign,
   FileText,
-  Gauge,
   PiggyBank,
   ReceiptText,
-  TriangleAlert,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
+
+import { TODAY } from "@/lib/acc/dashboard-data";
 
 /**
  * Accountant notifications. Module-level store so the topbar bell and the
@@ -25,28 +27,31 @@ export const ACC_NOTIFICATION_KINDS = [
   "Expense",
   "Budget",
   "Meter Reading",
+  "Reminder",
 ] as const;
 export type AccNotificationKind = (typeof ACC_NOTIFICATION_KINDS)[number];
 
 export const KIND_ICON: Record<AccNotificationKind, LucideIcon> = {
-  Payment: Banknote,
+  Payment: CircleDollarSign,
   Invoice: ReceiptText,
-  Overdue: TriangleAlert,
+  Overdue: CircleAlert,
   Billing: FileText,
   Expense: CalendarClock,
   Budget: PiggyBank,
-  "Meter Reading": Gauge,
+  "Meter Reading": Zap,
+  Reminder: CircleAlert,
 };
 
 /** Icon tile colours — money in is green, money at risk is red. */
 export const KIND_CHIP: Record<AccNotificationKind, string> = {
   Payment: "bg-green-50 text-green-600",
-  Invoice: "bg-[#eef3f9] text-[#2e6cad]",
+  Invoice: "bg-amber-50 text-amber-600",
   Overdue: "bg-rose-50 text-rose-600",
   Billing: "bg-[#eef3f9] text-[#2e6cad]",
   Expense: "bg-amber-50 text-amber-600",
   Budget: "bg-purple-50 text-purple-600",
-  "Meter Reading": "bg-amber-50 text-amber-600",
+  "Meter Reading": "bg-[#eef3f9] text-[#2e6cad]",
+  Reminder: "bg-rose-50 text-rose-600",
 };
 
 /**
@@ -62,6 +67,7 @@ export const KIND_SEVERITY: Record<AccNotificationKind, AccSeverity> = {
   Overdue: "critical",
   Budget: "warning",
   "Meter Reading": "warning",
+  Reminder: "warning",
   Invoice: "info",
   Billing: "info",
   Expense: "info",
@@ -79,62 +85,119 @@ export type AccNotification = {
   read: boolean;
 };
 
+/** Whole days from today to an ISO date — keeps "due in 8 days" honest. */
+function daysUntil(iso: string) {
+  const [year, month, day] = iso.split("-").map(Number);
+  const [thisYear, thisMonth, thisDay] = TODAY.split("-").map(Number);
+
+  return Math.round(
+    (Date.UTC(year, month - 1, day) -
+      Date.UTC(thisYear, thisMonth - 1, thisDay)) /
+      86_400_000,
+  );
+}
+
+/**
+ * What was waiting when the accountant signed in.
+ *
+ * Not sorted by age: the order is the one the bell built up, and re-sorting it
+ * on every render would shuffle the list under a finger already reaching for a
+ * row. The figures name records that exist elsewhere in the portal — INV-2046
+ * really is the 295,000 CleanPro invoice — so following one up leads somewhere.
+ */
 const seed: AccNotification[] = [
   {
     id: "an1",
-    title: "20 Invoices Now Overdue",
-    detail:
-      "Sunrise Residence · August cycle · LKR 268,400 past the 10 Aug due date.",
-    time: "20 min ago",
-    kind: "Overdue",
-    severity: "critical",
-    read: false,
-  },
-  {
-    id: "an2",
-    title: "Payment Received",
-    detail: "Tom Harris · Unit A-501 · LKR 25,700 by card against INV-2026-0788.",
-    time: "1 hour ago",
+    title: "New Payment Received",
+    detail: "Sarah Johnson (B-205) paid LKR 25,200 via Online transfer.",
+    time: "2 hours ago",
     kind: "Payment",
     severity: "success",
     read: false,
   },
   {
+    id: "an2",
+    title: "Bill Generation Completed",
+    detail: "August utility bills for Tower A successfully generated (32 units).",
+    time: "5 hours ago",
+    kind: "Billing",
+    severity: "info",
+    read: false,
+  },
+  {
     id: "an3",
-    title: "Meter Readings Due",
+    title: "Vendor Invoice Received",
     detail:
-      "Tower B submeters have not been read for the August cycle — 34 units outstanding.",
-    time: "3 hours ago",
-    kind: "Meter Reading",
-    severity: "warning",
+      "AquaClean Pool Services submitted invoice INV-2048 for LKR 100,300.",
+    time: "1 hour ago",
+    kind: "Invoice",
+    severity: "info",
     read: false,
   },
   {
     id: "an4",
-    title: "Maintenance Budget at 84%",
+    title: "Payment Pending Verification",
     detail:
-      "Sunrise Residence has LKR 350,000 left of the LKR 2,200,000 August allocation.",
+      "Emily Watson (A-101) made cash payment of LKR 20,000. Awaiting verification.",
+    time: "3 hours ago",
+    kind: "Payment",
+    severity: "info",
+    read: false,
+  },
+  {
+    id: "an5",
+    title: "Budget Threshold Alert",
+    detail:
+      "Maintenance expenses have reached 76% of annual budget (LKR 3.8M of LKR 5M).",
     time: "Yesterday",
     kind: "Budget",
     severity: "warning",
     read: true,
   },
   {
-    id: "an5",
-    title: "Vendor Invoice Logged",
-    detail: "CleanPro Services · LKR 295,000 · scheduled for payment on 18 Aug.",
+    id: "an6",
+    title: "Invoice Due Reminder",
+    detail: `CleanPro Services invoice INV-2046 (LKR 295,000) due in ${daysUntil("2026-08-20")} days.`,
     time: "Yesterday",
-    kind: "Expense",
+    kind: "Invoice",
     severity: "info",
     read: true,
   },
   {
-    id: "an6",
-    title: "July Billing Cycle Closed",
-    detail: "318 invoices issued, 312 settled — collection rate 94.5%.",
+    id: "an7",
+    title: "Failed Payment",
+    detail: "Online payment from Lisa Chen (B-302) failed. Card declined.",
     time: "2 days ago",
-    kind: "Billing",
-    severity: "info",
+    kind: "Payment",
+    severity: "critical",
+    read: true,
+  },
+  {
+    id: "an8",
+    title: "Utility Reading Missing",
+    detail: "Tower C - Unit C-102 electricity reading not submitted for August.",
+    time: "3 days ago",
+    kind: "Meter Reading",
+    severity: "warning",
+    read: true,
+  },
+  {
+    id: "an9",
+    title: "Overdue Payment Escalated",
+    detail:
+      "Anna Martinez (B-503) is 2 days overdue on LKR 34,900. Second reminder sent.",
+    time: "Yesterday",
+    kind: "Overdue",
+    severity: "critical",
+    read: true,
+  },
+  {
+    id: "an10",
+    title: "Month-End Closing Reminder",
+    detail: `August month-end closing in ${daysUntil("2026-08-31")} days. Review outstanding items.`,
+    time: "2 days ago",
+    kind: "Reminder",
+    severity: "warning",
     read: true,
   },
 ];
@@ -199,4 +262,42 @@ function getServerSnapshot() {
 
 export function useAccNotifications() {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+}
+
+/* --------------------------------- Filters -------------------------------- */
+
+/**
+ * The chip row on the notifications page.
+ *
+ * Six of them narrow by subject; "Warning" cuts across all of them by how
+ * urgently the item reads, because "what needs me today" is a different
+ * question from "what is this about" and the accountant asks both.
+ */
+export const ACC_NOTIFICATION_FILTERS = [
+  "All",
+  "Payment",
+  "Bill",
+  "Invoice",
+  "Budget",
+  "Utility",
+  "Warning",
+] as const;
+export type AccNotificationFilter = (typeof ACC_NOTIFICATION_FILTERS)[number];
+
+/** Which kinds each subject chip covers; "Warning" is handled on severity. */
+const FILTER_KINDS: Record<string, AccNotificationKind[]> = {
+  Payment: ["Payment"],
+  Bill: ["Billing"],
+  // A supplier invoice and the expense it becomes are the same paperwork.
+  Invoice: ["Invoice", "Expense"],
+  Budget: ["Budget"],
+  Utility: ["Meter Reading"],
+};
+
+export function matchesAccFilter(item: AccNotification, filter: string) {
+  if (filter === "All") return true;
+  if (filter === "Warning") {
+    return item.severity === "critical" || item.severity === "warning";
+  }
+  return (FILTER_KINDS[filter] ?? []).includes(item.kind);
 }

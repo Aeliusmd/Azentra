@@ -24,9 +24,9 @@ export type AccProfile = {
 const initial: AccProfile = {
   name: "Priya Sharma",
   role: "Accountant",
-  employeeId: "EMP-ACC-001",
-  email: "accounts@azentra.com",
-  phone: "+94 77 402 1188",
+  employeeId: "EMP-ACCT-001",
+  email: "accountant@azentra.com",
+  phone: "+1 555 0401",
   properties: [
     "Sunrise Residence",
     "Ocean View Towers",
