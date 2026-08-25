@@ -21,8 +21,12 @@ import {
 
 type Tab = "Book a Facility" | "My Bookings";
 
-/** Tiles in the first row are above the fold; their photos load eagerly. */
-const EAGER_ROW = 3;
+/**
+ * How many photos load eagerly. Two rows of the widest grid — on a tall screen
+ * both are above the fold, and leaving the second to lazy-load makes it the
+ * last thing to paint.
+ */
+const EAGER_ROW = 6;
 
 function FacilityCard({
   facility,

@@ -34,9 +34,9 @@ function emit() {
 
 /** Reference prefixes, so a mock reference looks like the method that made it. */
 const REFERENCE_PREFIX: Record<PaymentMethod, string> = {
-  Card: "CRD",
+  "Credit / Debit Card": "CRD",
   "Bank Transfer": "TRF",
-  "Online Payment": "ONL",
+  "Mobile Payment": "MOB",
 };
 
 let sequence = 0;

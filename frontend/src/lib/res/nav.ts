@@ -7,6 +7,7 @@ import {
   FileText,
   House,
   Receipt,
+  Settings,
   UserRound,
   Users,
   Wrench,
@@ -41,15 +42,16 @@ export const resNavItems: ResNavItem[] = [
   { label: "Documents", href: `${RES_BASE}/documents`, icon: FileText },
   { label: "Calendar", href: `${RES_BASE}/calendar`, icon: CalendarDays },
   { label: "Notifications", href: `${RES_BASE}/notifications`, icon: Bell },
-  { label: "Profile", href: `${RES_BASE}/profile`, icon: UserRound },
 ];
 
 /**
- * Reachable but not on the rail — the profile menu's Settings entry. Listed so
- * it resolves to a section rather than a 404 while its screen is pending.
+ * Reachable, but reached from the profile menu in the topbar rather than the
+ * rail. Listed here so they still resolve to a section — and so the breadcrumb
+ * can name them — instead of 404-ing.
  */
 const OFF_RAIL: ResNavItem[] = [
-  { label: "Settings", href: `${RES_BASE}/settings`, icon: UserRound },
+  { label: "Profile", href: `${RES_BASE}/profile`, icon: UserRound },
+  { label: "Settings", href: `${RES_BASE}/settings`, icon: Settings },
 ];
 
 const ALL_ITEMS = [...resNavItems, ...OFF_RAIL];

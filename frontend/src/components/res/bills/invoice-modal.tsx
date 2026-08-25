@@ -8,15 +8,8 @@ import {
   periodLabel,
   type ResidentInvoice,
 } from "@/lib/res/bills-data";
-import { payResidentInvoice } from "@/lib/res/bills-store";
-import { TODAY } from "@/lib/res/dashboard-data";
+import { PayInvoiceModal } from "@/components/res/bills/pay-modal";
 import { lkr, longDate } from "@/lib/res/format";
-import {
-  receiptNumberFor,
-  PAYMENT_METHODS,
-  type PaymentMethod,
-} from "@/lib/res/payments-data";
-import { showResToast } from "@/lib/res/toast-store";
 
 /** A charge line, or one of the totals under the rule. */
 function Line({
@@ -64,18 +57,9 @@ export function InvoiceModal({
   invoice: ResidentInvoice;
   onClose: () => void;
 }) {
-  const [method, setMethod] = useState<PaymentMethod>("Card");
-  const [choosing, setChoosing] = useState(false);
+  const [paying, setPaying] = useState(false);
 
   const balance = balanceOf(invoice);
-
-  function handlePay() {
-    const payment = payResidentInvoice(invoice.id, method, TODAY);
-    if (!payment) return;
-
-    showResToast(`${lkr(payment.amount)} paid · ${receiptNumberFor(payment)}`);
-    onClose();
-  }
 
   return (
     <Modal
@@ -115,43 +99,27 @@ export function InvoiceModal({
           <Line label="Due Date" value={longDate(invoice.dueDate)} indent />
         </dl>
 
-        {choosing && (
-          <div className="mt-4 rounded-lg border border-hairline px-4 py-4">
-            <p className="text-[13px] font-semibold text-ink">How would you like to pay?</p>
-            <p className="mt-1 text-[13px] text-muted">
-              A demonstration only — no card details are taken and no money
-              moves.
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {PAYMENT_METHODS.map((option) => (
-                <button
-                  key={option}
-                  type="button"
-                  onClick={() => setMethod(option)}
-                  aria-pressed={option === method}
-                  className={`rounded-full px-4 py-1.5 text-[13px] font-medium transition-colors focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:outline-none ${
-                    option === method
-                      ? "bg-[#1b3a5c] text-white"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200/70"
-                  }`}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         {balance > 0 && (
           <button
             type="button"
-            onClick={() => (choosing ? handlePay() : setChoosing(true))}
+            onClick={() => setPaying(true)}
             className="mt-5 w-full rounded-lg bg-brand px-5 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
-            {choosing ? "Confirm" : "Pay Now"} — {lkr(balance)}
+            Pay Now — {lkr(balance)}
           </button>
         )}
       </div>
+
+      {paying && (
+        <PayInvoiceModal
+          invoice={invoice}
+          onClose={() => setPaying(false)}
+          onPaid={() => {
+            setPaying(false);
+            onClose();
+          }}
+        />
+      )}
     </Modal>
   );
 }

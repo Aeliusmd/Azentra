@@ -9,9 +9,9 @@ import { residentInvoices, type ResidentInvoice } from "@/lib/res/bills-data";
  */
 
 export const PAYMENT_METHODS = [
-  "Card",
+  "Credit / Debit Card",
   "Bank Transfer",
-  "Online Payment",
+  "Mobile Payment",
 ] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
@@ -36,7 +36,7 @@ export const residentPayments: ResidentPayment[] = [
     id: "PAY-2026-0774",
     invoiceId: "FAC-2026-0219",
     date: "2026-08-10",
-    method: "Card",
+    method: "Credit / Debit Card",
     amount: 15_000,
     reference: "CRD-8841-2290",
     status: "Completed",
@@ -54,9 +54,9 @@ export const residentPayments: ResidentPayment[] = [
     id: "PAY-2026-0661",
     invoiceId: "BIL-2026-00404",
     date: "2026-06-27",
-    method: "Online Payment",
+    method: "Mobile Payment",
     amount: 27_500,
-    reference: "ONL-7712-6640",
+    reference: "MOB-7712-6640",
     status: "Completed",
   },
   {

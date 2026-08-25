@@ -102,6 +102,7 @@ export const facilities: Facility[] = [
     description:
       "Outdoor BBQ area with grills, seating for 20, perfect for weekend gatherings",
     icon: Flame,
+    image: "/BBQ.png",
     gradient: "from-orange-400 to-rose-600",
     location: "Rooftop, Tower B",
     capacity: 20,
