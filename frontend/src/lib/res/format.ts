@@ -8,6 +8,11 @@
 
 const GROUPED = new Intl.NumberFormat("en-US");
 
+/** `1250` → `1,250` — counts and areas, which carry no currency. */
+export function grouped(value: number) {
+  return GROUPED.format(Math.round(value));
+}
+
 /** `29300` → `LKR 29,300`. */
 export function lkr(amount: number) {
   return `LKR ${GROUPED.format(Math.round(amount))}`;
@@ -56,6 +61,14 @@ export function clockTime(time: string) {
   return `${twelve}:${String(minute).padStart(2, "0")} ${suffix}`;
 }
 
+/** `21:30` → `09:30 PM` — the padded form a timeline stamp reads in. */
+export function clockPadded(time: string) {
+  const [hour, minute] = time.split(":").map(Number);
+  const suffix = hour < 12 ? "AM" : "PM";
+  const twelve = hour % 12 === 0 ? 12 : hour % 12;
+  return `${String(twelve).padStart(2, "0")}:${String(minute).padStart(2, "0")} ${suffix}`;
+}
+
 /** `07:00`, `09:00` → `7:00 AM - 9:00 AM`. */
 export function timeRange(from: string, to: string) {
   return `${clockTime(from)} - ${clockTime(to)}`;
@@ -95,4 +108,13 @@ export function timeRangeShort(from: string, to: string) {
 export function minutesOf(time: string) {
   const [hour, minute] = time.split(":").map(Number);
   return hour * 60 + minute;
+}
+
+/** `Maria Rodriguez` → `MR`, for the avatar beside a name. */
+export function initialsOf(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  const first = parts[0].charAt(0);
+  const last = parts.length > 1 ? parts[parts.length - 1].charAt(0) : "";
+  return `${first}${last}`.toUpperCase();
 }

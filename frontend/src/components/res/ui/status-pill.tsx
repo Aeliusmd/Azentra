@@ -76,8 +76,8 @@ export function InvoiceStatusPill({ status }: { status: InvoiceStatus }) {
 }
 
 const VISITOR_TONE: Record<VisitorStatus, ResTone> = {
-  Upcoming: "blue",
-  Active: "green",
+  Approved: "green",
+  Pending: "amber",
   "Checked In": "green",
   "Checked Out": "slate",
   Expired: "slate",

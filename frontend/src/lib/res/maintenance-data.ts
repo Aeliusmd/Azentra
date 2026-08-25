@@ -1,3 +1,5 @@
+import type { ResUpload } from "@/lib/res/uploads";
+
 /**
  * Maintenance the resident has asked for, on their own unit.
  *
@@ -80,12 +82,8 @@ export const PRIORITY_TEXT: Record<RequestPriority, string> = {
   High: "text-rose-600",
 };
 
-export type RequestPhoto = {
-  id: string;
-  name: string;
-  /** Object URL of the picked file — never uploaded anywhere. */
-  url: string;
-};
+/** Photos attached to a request; the same shape the complaint form uses. */
+export type RequestPhoto = ResUpload;
 
 export type MaintenanceRequest = {
   id: string;

@@ -34,8 +34,6 @@ export type InvoiceStatus =
 /** One line on an invoice — what it is and what it came to. */
 export type InvoiceLine = {
   label: string;
-  /** Shown where the charge is metered, e.g. `280 units @ LKR 25`. */
-  basis?: string;
   amount: number;
 };
 
@@ -64,11 +62,11 @@ const INVOICES: ResidentInvoice[] = [
     period: "2026-08",
     type: "Maintenance Charge",
     lines: [
-      { label: "Monthly Maintenance", amount: 12_500 },
-      { label: "Water", basis: "280 units @ LKR 25", amount: 7_000 },
-      { label: "Electricity", basis: "650 units @ LKR 65", amount: 6_500 },
-      { label: "Common Area Charge", amount: 2_400 },
-      { label: "Sinking Fund", amount: 900 },
+      { label: "Maintenance Fee", amount: 15_000 },
+      { label: "Water", amount: 2_500 },
+      { label: "Electricity", amount: 6_800 },
+      { label: "Parking", amount: 2_000 },
+      { label: "Sinking Fund", amount: 3_000 },
     ],
     subtotal: 29_300,
     adjustment: 0,
@@ -82,11 +80,11 @@ const INVOICES: ResidentInvoice[] = [
     period: "2026-07",
     type: "Maintenance Charge",
     lines: [
-      { label: "Monthly Maintenance", amount: 12_500 },
-      { label: "Water", basis: "265 units @ LKR 25", amount: 6_625 },
-      { label: "Electricity", basis: "610 units @ LKR 65", amount: 6_175 },
-      { label: "Common Area Charge", amount: 2_400 },
-      { label: "Sinking Fund", amount: 900 },
+      { label: "Maintenance Fee", amount: 15_000 },
+      { label: "Water", amount: 2_300 },
+      { label: "Electricity", amount: 6_300 },
+      { label: "Parking", amount: 2_000 },
+      { label: "Sinking Fund", amount: 3_000 },
     ],
     subtotal: 28_600,
     adjustment: 0,
@@ -100,11 +98,11 @@ const INVOICES: ResidentInvoice[] = [
     period: "2026-06",
     type: "Maintenance Charge",
     lines: [
-      { label: "Monthly Maintenance", amount: 12_500 },
-      { label: "Water", basis: "251 units @ LKR 25", amount: 6_275 },
-      { label: "Electricity", basis: "588 units @ LKR 65", amount: 5_820 },
-      { label: "Common Area Charge", amount: 2_400 },
-      { label: "Sinking Fund", amount: 900 },
+      { label: "Maintenance Fee", amount: 15_000 },
+      { label: "Water", amount: 2_195 },
+      { label: "Electricity", amount: 5_700 },
+      { label: "Parking", amount: 2_000 },
+      { label: "Sinking Fund", amount: 3_000 },
     ],
     subtotal: 27_895,
     adjustment: -395,
@@ -130,11 +128,11 @@ const INVOICES: ResidentInvoice[] = [
     period: "2026-05",
     type: "Maintenance Charge",
     lines: [
-      { label: "Monthly Maintenance", amount: 12_500 },
-      { label: "Water", basis: "244 units @ LKR 25", amount: 6_100 },
-      { label: "Electricity", basis: "572 units @ LKR 65", amount: 5_200 },
-      { label: "Common Area Charge", amount: 2_400 },
-      { label: "Sinking Fund", amount: 900 },
+      { label: "Maintenance Fee", amount: 15_000 },
+      { label: "Water", amount: 2_100 },
+      { label: "Electricity", amount: 5_000 },
+      { label: "Parking", amount: 2_000 },
+      { label: "Sinking Fund", amount: 3_000 },
     ],
     subtotal: 27_100,
     adjustment: 0,

@@ -211,11 +211,7 @@ export function ResBillsView() {
       </Card>
 
       {open && (
-        <InvoiceModal
-          invoice={open}
-          payments={payments}
-          onClose={() => setOpenId(null)}
-        />
+        <InvoiceModal invoice={open} onClose={() => setOpenId(null)} />
       )}
     </div>
   );

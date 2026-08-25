@@ -14,7 +14,11 @@ import {
   isOpenRequest,
   type MaintenanceRequest,
 } from "@/lib/res/maintenance-data";
-import { passesThisWeek, visitorPasses } from "@/lib/res/visitors-data";
+import {
+  passesThisWeek,
+  visitorPasses,
+  type VisitorPass,
+} from "@/lib/res/visitors-data";
 
 /**
  * The resident's home screen, assembled from the records themselves.
@@ -47,6 +51,7 @@ export function resDashboard(
   invoices: ResidentInvoice[] = residentInvoices,
   requests: MaintenanceRequest[] = maintenanceRequests,
   allBookings: FacilityBooking[] = facilityBookings,
+  passes: VisitorPass[] = visitorPasses,
 ): ResDashboard {
   const open = requests.filter(isOpenRequest);
   const bookings = upcomingBookings(today, allBookings);
@@ -59,6 +64,6 @@ export function resDashboard(
     openRequestCount: open.length,
     upcoming: bookings.slice(0, PREVIEW),
     upcomingBookingCount: bookings.length,
-    visitorsThisWeek: passesThisWeek(today, visitorPasses).length,
+    visitorsThisWeek: passesThisWeek(today, passes).length,
   };
 }

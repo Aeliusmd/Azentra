@@ -23,6 +23,7 @@ import { lkr, longDate, monthAndYear, timeRange } from "@/lib/res/format";
 import { RES_BASE } from "@/lib/res/nav";
 import { useResInvoices } from "@/lib/res/bills-store";
 import { useResBookings } from "@/lib/res/bookings-store";
+import { useResVisitors } from "@/lib/res/visitors-store";
 import { resDashboard, TODAY } from "@/lib/res/dashboard-data";
 import { useResRequests } from "@/lib/res/maintenance-store";
 import {
@@ -221,7 +222,8 @@ export function ResDashboardView() {
   const invoices = useResInvoices();
   const requests = useResRequests();
   const bookings = useResBookings();
-  const data = resDashboard(TODAY, invoices, requests, bookings);
+  const visitors = useResVisitors();
+  const data = resDashboard(TODAY, invoices, requests, bookings, visitors);
 
   return (
     <div className="space-y-5 sm:space-y-6">

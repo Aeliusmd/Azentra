@@ -46,10 +46,7 @@ export function invoiceLines(
 
   for (const line of invoice.lines) {
     lines.push({
-      text: row(
-        line.basis ? `${line.label} (${line.basis})` : line.label,
-        lkr(line.amount),
-      ),
+      text: row(line.label, lkr(line.amount)),
       size: 11,
       gap: 6,
     });

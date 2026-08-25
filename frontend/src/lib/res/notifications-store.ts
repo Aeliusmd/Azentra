@@ -90,7 +90,7 @@ const seed: ResNotification[] = [
   {
     id: "rn4",
     title: "Visitor Pass Created",
-    detail: "Michael Rodriguez · 14 August · pass VP-2026-1184.",
+    detail: "Maria Rodriguez · 15 August · pass VP-2026-1184.",
     time: "Yesterday",
     kind: "Visitor",
     read: true,
