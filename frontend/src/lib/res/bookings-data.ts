@@ -50,6 +50,15 @@ export const facilityBookings: FacilityBooking[] = [
     status: "Confirmed",
   },
   {
+    id: "BK-2026-0438",
+    facility: "Meeting Room",
+    date: "2026-08-18",
+    from: "14:00",
+    to: "16:00",
+    guests: 6,
+    status: "Pending",
+  },
+  {
     id: "BK-2026-0388",
     facility: "Gymnasium",
     date: "2026-08-04",
@@ -69,13 +78,22 @@ export const facilityBookings: FacilityBooking[] = [
   },
 ];
 
-/** Reservations still ahead of a given day, soonest first. */
-export function upcomingBookings(today: string, bookings = facilityBookings) {
+/**
+ * Reservations still ahead of a given day, soonest first.
+ *
+ * Confirmed only by default: a request the property has not agreed to yet is
+ * not a booking, and counting it as one would have the dashboard promise a slot
+ * nobody has held. The calendar passes `Pending` in as well, because a resident
+ * still wants to see what they have asked for.
+ */
+export function upcomingBookings(
+  today: string,
+  bookings = facilityBookings,
+  statuses: BookingStatus[] = ["Confirmed"],
+) {
   return bookings
     .filter(
-      (booking) =>
-        booking.date >= today &&
-        (booking.status === "Confirmed" || booking.status === "Pending"),
+      (booking) => booking.date >= today && statuses.includes(booking.status),
     )
     .sort((a, b) => a.date.localeCompare(b.date));
 }

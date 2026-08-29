@@ -31,7 +31,7 @@ import {
   requestProgress,
   type MaintenanceRequest,
 } from "@/lib/res/maintenance-data";
-import { resFirstName, resInitials, useResProfile } from "@/lib/res/profile-store";
+import { resInitials, useResProfile } from "@/lib/res/profile-store";
 import { residentUnit, unitLine } from "@/lib/res/resident";
 
 /* --------------------------------- Pieces --------------------------------- */
@@ -230,7 +230,7 @@ export function ResDashboardView() {
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <h1 className="text-[24px] leading-tight font-bold text-ink sm:text-[28px]">
-            Welcome back, {resFirstName(profile.name)}
+            Welcome back, {profile.firstName}
           </h1>
           <p className="mt-1 text-[14px] text-muted">{unitLine()}</p>
         </div>
@@ -239,7 +239,7 @@ export function ResDashboardView() {
           aria-hidden="true"
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#e8eef5] text-[16px] font-semibold text-[#1b3a5c]"
         >
-          {resInitials(profile.name)}
+          {resInitials(profile)}
         </span>
       </div>
 

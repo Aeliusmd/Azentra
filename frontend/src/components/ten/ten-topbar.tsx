@@ -1,21 +1,59 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, LogOut, Menu, Settings, UserRound } from "lucide-react";
+import { Bell, ChevronDown, LogOut, Menu, UserRound } from "lucide-react";
 
-import { ResNotificationsMenu } from "@/components/res/res-notifications-menu";
+import { TenNotificationsMenu } from "@/components/ten/ten-notifications-menu";
 import { useDismiss } from "@/hooks/use-dismiss";
-import { RES_BASE, resNavLabelFor } from "@/lib/res/nav";
-import { resFullName, useResProfile } from "@/lib/res/profile-store";
+import { TEN_BASE, tenNavLabelFor } from "@/lib/ten/nav";
+import {
+  tenFullName,
+  tenInitials,
+  useTenProfile,
+} from "@/lib/ten/profile-store";
 
 const MENU_ITEM =
   "flex items-center gap-3 px-5 py-3 text-[15px] transition-colors hover:bg-gray-50";
 
-export function ResTopbar({ onOpenMenu }: { onOpenMenu: () => void }) {
+/** Photo where one has been picked, initials otherwise. */
+function Avatar({
+  src,
+  initials,
+  className,
+}: {
+  src: string | null;
+  initials: string;
+  className: string;
+}) {
+  if (src) {
+    return (
+      <Image
+        src={src}
+        alt=""
+        width={40}
+        height={40}
+        unoptimized
+        className={`${className} object-cover`}
+      />
+    );
+  }
+
+  return (
+    <span
+      aria-hidden="true"
+      className={`${className} flex items-center justify-center bg-[#e8eef5] font-semibold text-[#1b3a5c]`}
+    >
+      {initials}
+    </span>
+  );
+}
+
+export function TenTopbar({ onOpenMenu }: { onOpenMenu: () => void }) {
   const pathname = usePathname();
-  const profile = useResProfile();
+  const profile = useTenProfile();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
@@ -35,19 +73,19 @@ export function ResTopbar({ onOpenMenu }: { onOpenMenu: () => void }) {
 
         <nav aria-label="Breadcrumb" className="min-w-0">
           <ol className="flex items-center gap-2 text-[13px]">
-            <li className="font-semibold text-[#1b3a5c]">Resident</li>
+            <li className="font-semibold text-[#1b3a5c]">Tenant</li>
             <li aria-hidden="true" className="text-gray-300">
               ›
             </li>
             <li aria-current="page" className="truncate text-muted">
-              {resNavLabelFor(pathname)}
+              {tenNavLabelFor(pathname)}
             </li>
           </ol>
         </nav>
       </div>
 
       <div className="flex items-center gap-2 sm:gap-4">
-        <ResNotificationsMenu />
+        <TenNotificationsMenu />
 
         <div ref={menuRef} className="relative">
           <button
@@ -57,19 +95,16 @@ export function ResTopbar({ onOpenMenu }: { onOpenMenu: () => void }) {
             aria-expanded={menuOpen}
             className="flex items-center gap-2.5 rounded-md p-1 transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-brand/30 focus-visible:outline-none"
           >
-            <span
-              aria-hidden="true"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e8eef5] text-[17px] font-semibold text-[#1b3a5c]"
-            >
-              {profile.firstName.charAt(0).toUpperCase()}
-            </span>
+            <Avatar
+              src={profile.avatar}
+              initials={tenInitials(profile)}
+              className="h-10 w-10 shrink-0 rounded-full text-[15px]"
+            />
             <span className="hidden text-left sm:block">
               <span className="block text-[15px] font-bold text-ink">
-                {resFullName(profile)}
+                {tenFullName(profile)}
               </span>
-              <span className="block text-[13px] text-muted">
-                {profile.role}
-              </span>
+              <span className="block text-[13px] text-muted">Tenant</span>
             </span>
             <ChevronDown aria-hidden="true" className="h-4 w-4 text-gray-400" />
           </button>
@@ -80,14 +115,18 @@ export function ResTopbar({ onOpenMenu }: { onOpenMenu: () => void }) {
               className="absolute right-0 z-30 mt-2 w-[250px] overflow-hidden rounded-xl border border-hairline bg-white shadow-lg"
             >
               <div className="border-b border-hairline px-5 py-4">
-                <p className="text-[15px] font-bold text-ink">{resFullName(profile)}</p>
-                <p className="mt-0.5 text-[13px] text-muted">{profile.email}</p>
+                <p className="text-[15px] font-bold text-ink">
+                  {tenFullName(profile)}
+                </p>
+                <p className="mt-0.5 truncate text-[13px] text-muted">
+                  {profile.email}
+                </p>
               </div>
 
               <div className="border-b border-hairline py-1">
                 <Link
                   role="menuitem"
-                  href={`${RES_BASE}/profile`}
+                  href={`${TEN_BASE}/profile`}
                   onClick={closeMenu}
                   className={`${MENU_ITEM} text-gray-700`}
                 >
@@ -99,15 +138,15 @@ export function ResTopbar({ onOpenMenu }: { onOpenMenu: () => void }) {
                 </Link>
                 <Link
                   role="menuitem"
-                  href={`${RES_BASE}/settings`}
+                  href={`${TEN_BASE}/notifications`}
                   onClick={closeMenu}
                   className={`${MENU_ITEM} text-gray-700`}
                 >
-                  <Settings
+                  <Bell
                     aria-hidden="true"
                     className="h-[18px] w-[18px] text-gray-500"
                   />
-                  Settings
+                  Notifications
                 </Link>
               </div>
 

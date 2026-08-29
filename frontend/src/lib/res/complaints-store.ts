@@ -56,7 +56,7 @@ export function submitComplaint({
   listeners.forEach((listener) => listener());
 
   pushResNotification(
-    "Announcement",
+    "Complaint",
     "Complaint Submitted",
     `${complaint.id} · ${category} · the property manager will review it.`,
   );

@@ -118,3 +118,27 @@ export function initialsOf(name: string) {
   const last = parts.length > 1 ? parts[parts.length - 1].charAt(0) : "";
   return `${first}${last}`.toUpperCase();
 }
+
+export const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const LONG_WEEKDAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+/** `2026-08-13` → `Thu, Aug 13`. */
+export function weekdayShort(iso: string) {
+  const date = fromIso(iso);
+  return `${WEEKDAYS[date.getDay()]}, ${shortDate(iso)}`;
+}
+
+/** `2026-08-13` → `Thursday, August 13, 2026`. */
+export function longWeekdayDate(iso: string) {
+  const date = fromIso(iso);
+  return `${LONG_WEEKDAYS[date.getDay()]}, ${longDate(iso)}`;
+}
