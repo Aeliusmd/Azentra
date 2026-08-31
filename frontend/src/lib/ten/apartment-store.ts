@@ -79,29 +79,6 @@ export function registerTenVehicle(input: VehicleInput): TenVehicle {
   return vehicle;
 }
 
-/**
- * Corrects a car the tenant already registered.
- *
- * Changing the plate sends it back to `Pending` — the gate was cleared for the
- * old one, and saying otherwise would be a promise this portal cannot keep.
- * Fixing the colour or the model is just a correction and leaves it alone.
- */
-export function updateTenVehicle(id: string, input: VehicleInput) {
-  vehicles = vehicles.map((vehicle) => {
-    if (vehicle.id !== id) return vehicle;
-
-    const next = normalise(input);
-    const plateChanged = next.plate !== vehicle.plate;
-
-    return {
-      ...vehicle,
-      ...next,
-      status: plateChanged ? "Pending" : vehicle.status,
-    };
-  });
-  emit();
-}
-
 function subscribe(listener: () => void) {
   listeners.add(listener);
   return () => listeners.delete(listener);

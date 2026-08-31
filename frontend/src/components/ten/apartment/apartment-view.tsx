@@ -131,7 +131,11 @@ export function TenApartmentView() {
       )}
 
       {tab === "Parking" && <TenParkingPanel />}
-      {tab === "Vehicles" && <TenVehiclesPanel />}
+      {tab === "Vehicles" && (
+        <div className="space-y-4">
+          <TenVehiclesPanel />
+        </div>
+      )}
     </div>
   );
 }

@@ -14,13 +14,13 @@ const LATEST_YEAR = 2027;
 const CONTROL = `${controlClasses()} px-3.5 py-3`;
 
 /**
- * Adding one of the tenant's own cars.
+ * Registering one of the tenant's own cars.
  *
  * Nothing here touches the parking allocation: which bay this tenancy holds is
  * the property's decision, so the form asks only about the vehicle. The bay a
  * car ends up in follows from its plate.
  */
-export function AddVehicleModal({ onClose }: { onClose: () => void }) {
+export function VehicleModal({ onClose }: { onClose: () => void }) {
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");

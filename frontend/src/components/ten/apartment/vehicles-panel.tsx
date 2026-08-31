@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Car, Plus } from "lucide-react";
 
-import { AddVehicleModal } from "@/components/ten/apartment/vehicle-modal";
+import { VehicleModal } from "@/components/ten/apartment/vehicle-modal";
 import { Card } from "@/components/ui/card";
 import { vehicleName } from "@/lib/ten/apartment-data";
 import { useTenVehicles } from "@/lib/ten/apartment-store";
@@ -11,9 +11,9 @@ import { useTenVehicles } from "@/lib/ten/apartment-store";
 /**
  * The cars this tenant keeps.
  *
- * Their own records, so they may add one — the only editable thing on this
- * screen. Which bay a car ends up in is still the property's to decide, so
- * nothing here assigns a space.
+ * The one editable thing on this screen: a tenant may register their own
+ * vehicle. Which bay it ends up in is not asked for here — that follows from
+ * the plate on the bay, and the allocation is the property's.
  */
 export function TenVehiclesPanel() {
   const vehicles = useTenVehicles();
@@ -22,7 +22,7 @@ export function TenVehiclesPanel() {
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-[15px] font-bold text-ink">My Vehicles</h2>
+        <h2 className="text-[16px] font-bold text-ink">My Vehicles</h2>
         <button
           type="button"
           onClick={() => setAdding(true)}
@@ -34,16 +34,16 @@ export function TenVehiclesPanel() {
       </div>
 
       {vehicles.length === 0 ? (
-        <Card className="mt-4 px-6 py-14 text-center">
+        <Card className="px-6 py-14 text-center">
           <p className="text-[14px] text-muted">
             No vehicle registered yet. Add yours so the gate recognises it.
           </p>
         </Card>
       ) : (
-        <ul className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {vehicles.map((vehicle) => (
             <li key={vehicle.id}>
-              <Card className="flex items-center gap-4 p-4 sm:p-5">
+              <Card className="flex items-center gap-4 p-4">
                 <span
                   aria-hidden="true"
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500"
@@ -66,7 +66,7 @@ export function TenVehiclesPanel() {
         </ul>
       )}
 
-      {adding && <AddVehicleModal onClose={() => setAdding(false)} />}
+      {adding && <VehicleModal onClose={() => setAdding(false)} />}
     </>
   );
 }

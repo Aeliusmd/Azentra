@@ -43,7 +43,6 @@ export const tenNavItems: TenNavItem[] = [
   { label: "Documents", href: `${TEN_BASE}/documents`, icon: FileText },
   { label: "Calendar", href: `${TEN_BASE}/calendar`, icon: CalendarDays },
   { label: "Notifications", href: `${TEN_BASE}/notifications`, icon: Bell },
-  { label: "Profile", href: `${TEN_BASE}/profile`, icon: UserRound },
 ];
 
 /**
@@ -52,6 +51,8 @@ export const tenNavItems: TenNavItem[] = [
  * breadcrumb can name them, instead of 404-ing.
  */
 const OFF_RAIL: TenNavItem[] = [
+  // Reached from the avatar menu in the topbar, so it is not on the rail too.
+  { label: "Profile", href: `${TEN_BASE}/profile`, icon: UserRound },
   { label: "Parking", href: `${TEN_BASE}/parking`, icon: CarFront },
   {
     label: "Announcements",

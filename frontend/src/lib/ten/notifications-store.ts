@@ -7,6 +7,7 @@ import {
   CarFront,
   CircleDollarSign,
   CreditCard,
+  Frown,
   Megaphone,
   TriangleAlert,
   UserRoundPlus,
@@ -29,6 +30,7 @@ export const TEN_NOTIFICATION_KINDS = [
   "Booking",
   "Visitor",
   "Parking",
+  "Complaint",
   "Announcement",
   "Emergency",
 ] as const;
@@ -42,6 +44,7 @@ export const KIND_ICON: Record<TenNotificationKind, LucideIcon> = {
   Booking: Building2,
   Visitor: UserRoundPlus,
   Parking: CarFront,
+  Complaint: Frown,
   Announcement: Megaphone,
   Emergency: TriangleAlert,
 };
@@ -55,6 +58,7 @@ export const KIND_CHIP: Record<TenNotificationKind, string> = {
   Booking: "bg-green-50 text-green-600",
   Visitor: "bg-[#eef3f9] text-[#2e6cad]",
   Parking: "bg-[#eef3f9] text-[#5b7f9c]",
+  Complaint: "bg-orange-50 text-orange-500",
   Announcement: "bg-[#eef4fb] text-[#2e6cad]",
   Emergency: "bg-rose-50 text-rose-600",
 };
@@ -79,76 +83,112 @@ export type TenNotification = {
 const seed: TenNotification[] = [
   {
     id: "tn1",
-    title: "Technician Assigned",
+    title: "Maintenance Update",
     detail:
-      "Nimal Fernando will attend your electrical request MR-2026-0821 on August 14 at 2:30 PM.",
-    time: "25 minutes ago",
+      "Technician John Perera has started work on your plumbing request MR-2026-0845",
+    time: "10 minutes ago",
     kind: "Maintenance",
     read: false,
   },
   {
     id: "tn2",
-    title: "Water Supply Interruption",
+    title: "Bill Generated",
     detail:
-      "Tower A water will be shut off on August 15, 9:00 AM to 2:00 PM for valve replacement.",
-    time: "1 hour ago",
-    kind: "Emergency",
-    read: false,
-  },
-  {
-    id: "tn3",
-    title: "Maintenance Appointment",
-    detail:
-      "John Perera attended MR-2026-0845 on August 11 at 10:30 AM. Work is under way.",
-    time: "3 hours ago",
-    kind: "Appointment",
-    read: false,
-  },
-  {
-    id: "tn4",
-    title: "New Bill Generated",
-    detail:
-      "Your August 2026 bill (LKR 11,300) is ready. Due date: August 31, 2026.",
+      "Your August 2026 utility bill (LKR 11,300) is ready. Due date: August 31, 2026.",
     time: "2 days ago",
     kind: "Billing",
     read: true,
   },
   {
-    id: "tn5",
-    title: "Visitor Pass Created",
+    id: "tn3",
+    title: "Lease Expiry Reminder",
     detail:
-      "Pass VP-2026-1190 for Jennifer Park on August 16 has been created.",
-    time: "3 days ago",
-    kind: "Visitor",
+      "Your lease will expire in 9 months on May 31, 2027. Please contact your landlord if you wish to renew.",
+    time: "1 week ago",
+    kind: "Announcement",
     read: true,
   },
   {
-    id: "tn6",
+    id: "tn4",
+    title: "Visitor Approved",
+    detail:
+      "Jennifer Park has been approved for visit on August 16. Parking slot B1-V05 assigned.",
+    time: "3 days ago",
+    kind: "Visitor",
+    read: false,
+  },
+  {
+    id: "tn5",
     title: "Facility Booking Confirmed",
     detail:
-      "Your BBQ Terrace booking for August 22 (5:00 PM - 9:00 PM) has been confirmed.",
+      "Your BBQ Terrace booking for August 22 (5 PM - 9 PM) has been confirmed.",
     time: "4 days ago",
     kind: "Booking",
     read: true,
   },
   {
-    id: "tn7",
-    title: "Payment Successful",
+    id: "tn6",
+    title: "Complaint Update",
     detail:
-      "LKR 3,000 received against invoice TIN-2026-00838. Balance remaining: LKR 4,000.",
-    time: "6 days ago",
-    kind: "Payment",
+      "Your noise complaint (CMP-2026-0045) is under review by the Property Manager.",
+    time: "3 days ago",
+    kind: "Complaint",
+    read: false,
+  },
+  {
+    id: "tn7",
+    title: "Property Announcement",
+    detail:
+      "Annual fire drill scheduled for August 20, 2026 from 10 AM - 12 PM. All residents and tenants must participate.",
+    time: "5 days ago",
+    kind: "Announcement",
     read: true,
   },
   {
     id: "tn8",
-    title: "New Announcement",
-    detail: "Lift B in Tower A will be out of service on August 18 and 19.",
-    time: "1 week ago",
-    kind: "Announcement",
+    title: "Payment Confirmed",
+    detail:
+      "Your July 2026 bill payment of LKR 10,790 has been received. Receipt is available in Documents.",
+    time: "2 weeks ago",
+    kind: "Payment",
     read: true,
   },
 ];
+
+/**
+ * The filters across the top of the notifications screen.
+ *
+ * A tab covers the kinds a tenant would think of as one thing — an appointment
+ * is maintenance to them, and a receipt is a bill. Kinds outside every tab
+ * (announcements, emergencies, parking) still show under "All", which is why
+ * "All" is not simply the union of the rest.
+ */
+export const TEN_NOTIFICATION_TABS = [
+  "All",
+  "Maintenance",
+  "Bills",
+  "Visitors",
+  "Facilities",
+  "Complaints",
+] as const;
+export type TenNotificationTab = (typeof TEN_NOTIFICATION_TABS)[number];
+
+const TAB_KINDS: Record<string, TenNotificationKind[]> = {
+  Maintenance: ["Maintenance", "Appointment"],
+  Bills: ["Billing", "Payment"],
+  Visitors: ["Visitor"],
+  Facilities: ["Booking"],
+  Complaints: ["Complaint"],
+};
+
+export function notificationsForTab(
+  tab: TenNotificationTab,
+  list: TenNotification[],
+) {
+  if (tab === "All") return list;
+  const kinds = TAB_KINDS[tab] ?? [];
+  return list.filter((item) => kinds.includes(item.kind));
+}
 
 let items: TenNotification[] = seed;
 const listeners = new Set<() => void>();
